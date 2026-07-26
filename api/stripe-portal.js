@@ -15,10 +15,14 @@ module.exports = async (req, res) => {
     if (!userRes.ok) return res.status(401).json({ error: 'token invalido' });
     const user = await userRes.json();
 
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/usuarios?id=eq.${user.id}&select=stripe_customer_id`, {
-      headers: { apikey: key, Authorization: `Bearer ${key}` },
+    // usa o proprio token do usuario (RLS ja permite ler a propria linha), sem depender de service role key
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/usuarios?select=stripe_customer_id`, {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${accessToken}` },
     });
+    if (!r.ok) {
+      console.error('erro ao buscar usuario', r.status, await r.text());
+      return res.status(500).json({ error: 'erro ao consultar assinatura' });
+    }
     const rows = await r.json();
     const customerId = rows[0] && rows[0].stripe_customer_id;
     if (!customerId) return res.status(400).json({ error: 'sem assinatura ativa' });
