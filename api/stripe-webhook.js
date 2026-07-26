@@ -60,7 +60,9 @@ module.exports = async (req, res) => {
       const sub = event.data.object;
       const usuarioId = sub.metadata && sub.metadata.usuario_id;
       const ativo = sub.status === 'active' || sub.status === 'trialing';
-      const expiraEm = sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null;
+      // API novas versoes movem current_period_end para dentro de items.data[]; mantem fallback pro formato antigo
+      const periodoFim = sub.current_period_end || (sub.items && sub.items.data && sub.items.data[0] && sub.items.data[0].current_period_end);
+      const expiraEm = periodoFim ? new Date(periodoFim * 1000).toISOString() : null;
       if (usuarioId) {
         await rpc('rpc_atualizar_assinatura', {
           p_usuario_id: usuarioId,
