@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
 
     const precos = {
       mensal: { unit_amount: 3600, interval: 'month', nome: 'Easyfarm Pro - Mensal' },
-      anual: { unit_amount: 30000, interval: 'year', nome: 'Easyfarm Pro - Anual' },
+      anual: { unit_amount: 29700, interval: 'year', nome: 'Easyfarm Pro - Anual' },
     };
     const p = precos[periodo] || precos.mensal;
     const origin = req.headers.origin || 'https://easyfarm-nine.vercel.app';
