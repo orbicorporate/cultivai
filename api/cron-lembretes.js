@@ -57,7 +57,29 @@ module.exports = async (req, res) => {
 
     await rpc('rpc_marcar_lembretes_notificados');
 
-    res.status(200).json({ ok: true, usuarios_avisados: usuariosVistos.size, pushes_enviados: enviados });
+    // Gift Pass expirados: avisa a pessoa que o presente de 7 dias acabou
+    const giftsExpirados = (await rpc('rpc_gift_passes_expirados_pendentes')) || [];
+    let giftsEnviados = 0;
+    for (const row of giftsExpirados) {
+      const payload = JSON.stringify({
+        title: 'CultivAI Gift Pass',
+        body: 'Seu presente de 7 dias chegou ao fim. Assine o Pro agora com 30% de desconto no anual 🌱',
+        url: '/?giftFim=1',
+      });
+      try {
+        await webpush.sendNotification({ endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } }, payload);
+        giftsEnviados++;
+      } catch (e) {
+        if (e.statusCode === 404 || e.statusCode === 410) {
+          try {
+            await rpc('rpc_remover_push_subscription_por_endpoint', { p_endpoint: row.endpoint });
+          } catch (_) {}
+        }
+      }
+    }
+    await rpc('rpc_marcar_gift_passes_notificados');
+
+    res.status(200).json({ ok: true, usuarios_avisados: usuariosVistos.size, pushes_enviados: enviados, gifts_enviados: giftsEnviados });
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: String(e) });
