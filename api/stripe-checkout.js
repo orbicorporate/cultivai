@@ -6,7 +6,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'method not allowed' });
   try {
-    const { accessToken, periodo } = req.body || {};
+    const { accessToken, periodo, desconto } = req.body || {};
     if (!accessToken) return res.status(401).json({ error: 'sem token' });
 
     const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
@@ -21,6 +21,16 @@ module.exports = async (req, res) => {
     };
     const p = precos[periodo] || precos.mensal;
     const origin = req.headers.origin || 'https://easyfarm-nine.vercel.app';
+
+    let discounts;
+    if (desconto === 'gift30' && periodo === 'anual') {
+      const coupon = await stripe.coupons.create({
+        percent_off: 30,
+        duration: 'once',
+        name: 'CultivAI Gift Pass - 30% no primeiro ano',
+      });
+      discounts = [{ coupon: coupon.id }];
+    }
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
@@ -37,6 +47,7 @@ module.exports = async (req, res) => {
           quantity: 1,
         },
       ],
+      ...(discounts ? { discounts } : {}),
       success_url: `${origin}/?assinatura=sucesso`,
       cancel_url: `${origin}/?assinatura=cancelado`,
       metadata: { usuario_id: user.id },
