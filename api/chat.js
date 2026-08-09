@@ -59,7 +59,7 @@ module.exports = async function handler(req, res) {
 
   // 2) Monta o prompt do especialista e chama a API da Anthropic.
   const contextoCultura = cultura && cultura.nome
-    ? `O produtor está cultivando ${cultura.nome}${regiao && regiao.label ? ` na região ${regiao.label} do Brasil` : ''}. `
+    ? `Esta conversa foi aberta a partir da página de ${cultura.nome}${regiao && regiao.label ? ` (região ${regiao.label} do Brasil)` : ''}, então se a pergunta do produtor for genérica (ex: "quando adubar?", "como controlar praga?") sem citar outra cultura, assuma que é sobre ${cultura.nome}. Mas isso é só o ponto de partida: você é especialista em TODAS as culturas agrícolas, não só essa. Se o produtor perguntar sobre qualquer outra cultura (ex: café, soja, milho, etc.), responda normalmente e com a mesma qualidade, sem restringir a conversa à cultura da página. `
     : '';
 
   const sistema =
