@@ -40,5 +40,77 @@
     "minimal-ui"
   ],
   "lang": "pt-BR",
-  "dir": "ltr"
+  "dir": "ltr",
+  "screenshots": [
+    {
+      "src": "/assets/screenshots/01-home.jpg",
+      "sizes": "852x1846",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Tela inicial com clima, planos ativos e resumo financeiro"
+    },
+    {
+      "src": "/assets/screenshots/02-regioes.jpg",
+      "sizes": "852x1846",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Mais de 118 culturas para simular por região ou tipo"
+    },
+    {
+      "src": "/assets/screenshots/03-area.jpg",
+      "sizes": "852x1846",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Simulação de área, custos, preços e resultado"
+    },
+    {
+      "src": "/assets/screenshots/04-mao-de-obra.jpg",
+      "sizes": "941x1672",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Cálculo de mão de obra com sugestões inteligentes"
+    },
+    {
+      "src": "/assets/screenshots/05-custos.jpg",
+      "sizes": "941x1672",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Custos de implantação e manejo detalhados"
+    },
+    {
+      "src": "/assets/screenshots/06-cenario.jpg",
+      "sizes": "941x1672",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Simule novos cenários com base no plano inicial"
+    },
+    {
+      "src": "/assets/screenshots/07-resultado.jpg",
+      "sizes": "941x1672",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Resultado da simulação com margem, receita e ROI"
+    },
+    {
+      "src": "/assets/screenshots/08-agente-ia.jpg",
+      "sizes": "941x1672",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Agente especialista Agro para identificar pragas e doenças"
+    },
+    {
+      "src": "/assets/screenshots/09-financeiro.jpg",
+      "sizes": "852x1847",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Central financeira completa separada por cultura"
+    },
+    {
+      "src": "/assets/screenshots/10-lancamentos.jpg",
+      "sizes": "852x1846",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Gestão financeira completa com lançamentos e vendas"
+    }
+  ]
 }
