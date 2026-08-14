@@ -112,5 +112,64 @@
       "form_factor": "narrow",
       "label": "Gestão financeira completa com lançamentos e vendas"
     }
-  ]
+  ],
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "shortcuts": [
+    {
+      "name": "Simular lucro",
+      "short_name": "Simular",
+      "description": "Simule o lucro da sua próxima cultura",
+      "url": "/?atalho=simular",
+      "icons": [
+        {
+          "src": "/assets/icons/flask.png",
+          "sizes": "218x218",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Registrar gasto",
+      "short_name": "Gasto",
+      "description": "Registre um gasto na Central financeira",
+      "url": "/?atalho=gasto",
+      "icons": [
+        {
+          "src": "/assets/icons/finance.png",
+          "sizes": "218x218",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Falar com a Easy",
+      "short_name": "Easy",
+      "description": "Tire dúvidas ou envie uma foto pra diagnóstico",
+      "url": "/?atalho=chat",
+      "icons": [
+        {
+          "src": "/chat-bubble-icon.png",
+          "sizes": "256x256",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "/compartilhar",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        {
+          "name": "foto",
+          "accept": [
+            "image/*"
+          ]
+        }
+      ]
+    }
+  }
 }
