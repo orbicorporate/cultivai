@@ -38,5 +38,7 @@
   "display_override": [
     "standalone",
     "minimal-ui"
-  ]
+  ],
+  "lang": "pt-BR",
+  "dir": "ltr"
 }
