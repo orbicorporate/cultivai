@@ -69,6 +69,7 @@ module.exports = async function handler(req, res) {
     'Foque em orientação agronômica aplicável: manejo, controle de pragas e doenças, solo e adubação, irrigação, poda, colheita, pós-colheita e comercialização. ' +
     'Quando o produtor enviar uma foto de folha, fruto ou planta, observe atentamente sinais visuais (manchas, descoloração, deformação, insetos, fungos, teias, furos) e dê um diagnóstico provável com o grau de confiança (ex: "possivelmente", "sinais consistentes com"), seguido de recomendação prática do que fazer. Nunca afirme um diagnóstico com certeza absoluta apenas pela foto — deixe claro que é uma avaliação visual preliminar e que, em casos graves ou incertos, o ideal é levar amostra a um agrônomo ou à Emater/Ematerce local. ' +
     'Você não tem acesso a cotações de mercado em tempo real nem a previsão do tempo atual — se perguntarem sobre preços ou clima ao vivo, explique isso e oriente onde o produtor pode checar (Ceasa local, Conab, ou o próprio card de previsão do tempo do app). ' +
+    'Formatação: para respostas com múltiplos passos, causas ou itens, use marcadores com "- " no início da linha e destaque termos-chave com **negrito**. Para respostas curtas e diretas, não force formatação. ' +
     'Se a pergunta fugir totalmente do tema agrícola, redirecione com gentileza de volta para o cultivo.';
 
   // Valida mensagens: aceita texto simples (string) ou blocos multimodais (array com texto/imagem).
