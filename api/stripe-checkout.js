@@ -16,11 +16,11 @@ module.exports = async (req, res) => {
     const user = await userRes.json();
 
     const precos = {
-      mensal: { unit_amount: 3600, interval: 'month', nome: 'Easyfarm Pro - Mensal' },
-      anual: { unit_amount: 29700, interval: 'year', nome: 'Easyfarm Pro - Anual' },
+      mensal: { unit_amount: 3600, interval: 'month', nome: 'CultivAI Pro - Mensal' },
+      anual: { unit_amount: 29700, interval: 'year', nome: 'CultivAI Pro - Anual' },
     };
     const p = precos[periodo] || precos.mensal;
-    const origin = req.headers.origin || 'https://easyfarm-nine.vercel.app';
+    const origin = req.headers.origin || 'https://cultivai.app';
 
     let discounts;
     if (desconto === 'gift30' && periodo === 'anual') {
