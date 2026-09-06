@@ -17,6 +17,22 @@
 </head>
 <body>
 <div id="root"></div>
+<script>
+(function(){var mostrou=false;
+function mostrar(titulo,detalhe){var r=document.getElementById('root');if(mostrou||!r||r.firstChild)return;mostrou=true;
+r.innerHTML='<div style="margin:24px;padding:18px;border-radius:14px;background:#fff;border:1px solid #fecaca;font-family:-apple-system,BlinkMacSystemFont,sans-serif">'+
+'<div style="font-size:15px;font-weight:800;color:#991b1b;margin-bottom:8px">Nao consegui abrir o CultivAI</div>'+
+'<div style="font-size:13px;color:#3f5c48;line-height:1.6">'+titulo+'</div>'+
+'<pre style="margin-top:10px;padding:10px;background:#f8fafc;border-radius:8px;font-size:11px;color:#475569;white-space:pre-wrap;word-break:break-word">'+detalhe+'</pre>'+
+'<button onclick="location.reload()" style="margin-top:12px;width:100%;padding:11px;border:none;border-radius:10px;background:#1B4332;color:#fff;font-size:13px;font-weight:700">Tentar de novo</button></div>';}
+window.addEventListener('error',function(e){var a=e.target;
+if(a&&a.tagName==='SCRIPT'){mostrar('Um arquivo necessario nao carregou (conexao ou bloqueio de rede).','Nao carregou:\n'+(a.src||'?'));return;}
+mostrar('Ocorreu um erro ao iniciar o app.',(e.message||'erro')+'\n'+(e.filename||'')+' linha '+(e.lineno||''));},true);
+window.addEventListener('unhandledrejection',function(e){mostrar('Erro de conexao ao iniciar.',String((e.reason&&e.reason.message)||e.reason||'promise rejeitada'));});
+setTimeout(function(){var f=[];if(!window.React)f.push('React');if(!window.ReactDOM)f.push('ReactDOM');if(!window.Babel)f.push('Babel');if(!window.supabase)f.push('Supabase');
+mostrar('O app demorou demais para abrir.',(f.length?('Nao carregou: '+f.join(', ')):'Bibliotecas carregaram OK')+'\nBabel: '+((window.Babel&&window.Babel.version)||'ausente'));},8000);})();
+</script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
