@@ -91,6 +91,35 @@ module.exports = async (req, res) => {
       }
     }
 
+    // Bonus de indicacao no anual: o cliente ja pagou o ano inteiro agora,
+    // e aqui empurramos a proxima cobranca em 3 meses (15 meses de acesso).
+    // Marcamos na metadata para nunca aplicar duas vezes.
+    if (event.type === 'invoice.paid' || event.type === 'invoice.payment_succeeded') {
+      try {
+        const inv = event.data.object;
+        const subId = typeof inv.subscription === 'string' ? inv.subscription : (inv.subscription && inv.subscription.id);
+        if (subId && inv.amount_paid > 0) {
+          const sub = await stripe.subscriptions.retrieve(subId);
+          const meta = sub.metadata || {};
+          if (meta.bonus_meses_extras && !meta.bonus_extras_aplicado) {
+            const meses = parseInt(meta.bonus_meses_extras, 10) || 0;
+            if (meses > 0 && sub.current_period_end) {
+              const fim = new Date(sub.current_period_end * 1000);
+              fim.setMonth(fim.getMonth() + meses);
+              await stripe.subscriptions.update(subId, {
+                trial_end: Math.floor(fim.getTime() / 1000),
+                proration_behavior: 'none',
+                metadata: { ...meta, bonus_extras_aplicado: new Date().toISOString() },
+              });
+              console.log(`bonus: renovacao de ${subId} adiada em ${meses} meses`);
+            }
+          }
+        }
+      } catch (e) {
+        console.error('nao consegui aplicar os meses extras', e.message);
+      }
+    }
+
     if (event.type === 'customer.subscription.updated' || event.type === 'customer.subscription.deleted') {
       const sub = event.data.object;
       const usuarioId = sub.metadata && sub.metadata.usuario_id;
