@@ -61,9 +61,9 @@ module.exports = async (req, res) => {
       discounts = [{ coupon: coupon.id }];
     }
 
-    // Os 3 meses extras sao ESTENDER o acesso, nao descontar valor:
-    // o periodo gratis vem antes da primeira cobranca. So no plano anual.
-    const diasGratis = bonus.tem && periodo === 'anual' ? 90 : undefined;
+    // Os 3 meses extras NAO sao periodo gratis no comeco: o cliente paga
+    // normalmente agora e o webhook empurra a proxima cobranca em 3 meses.
+    const bonusAnual = bonus.tem && periodo === 'anual';
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
@@ -85,8 +85,11 @@ module.exports = async (req, res) => {
       cancel_url: `${origin}/?assinatura=cancelado`,
       metadata: { usuario_id: user.id },
       subscription_data: {
-        metadata: { usuario_id: user.id, ...(bonus.tem ? { bonus_indicacao: bonus.codigo } : {}) },
-        ...(diasGratis ? { trial_period_days: diasGratis } : {}),
+        metadata: {
+          usuario_id: user.id,
+          ...(bonus.tem ? { bonus_indicacao: bonus.codigo } : {}),
+          ...(bonusAnual ? { bonus_meses_extras: '3' } : {}),
+        },
       },
     });
 
