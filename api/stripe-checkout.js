@@ -22,6 +22,24 @@ module.exports = async (req, res) => {
     const p = precos[periodo] || precos.mensal;
     const origin = req.headers.origin || 'https://cultivai.app';
 
+    // Bonus de indicacao: quem entrou pelo link de um embaixador ativo
+    // e ainda nao assinou ganha 10% de desconto + 2 meses gratis.
+    let bonus = { tem: false };
+    try {
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/rpc_meu_bonus_indicacao`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: '{}',
+      });
+      if (r.ok) bonus = (await r.json()) || { tem: false };
+    } catch (e) {
+      console.error('nao consegui checar o bonus de indicacao', e.message);
+    }
+
     let discounts;
     if (desconto === 'gift30' && periodo === 'anual') {
       const coupon = await stripe.coupons.create({
@@ -30,7 +48,22 @@ module.exports = async (req, res) => {
         name: 'CultivAI Gift Pass - 30% no primeiro ano',
       });
       discounts = [{ coupon: coupon.id }];
+    } else if (bonus.tem) {
+      // No mensal o desconto acompanha os 12 meses do ciclo de comissao;
+      // no anual ele incide sobre a anuidade.
+      const coupon = await stripe.coupons.create({
+        percent_off: 10,
+        ...(periodo === 'anual'
+          ? { duration: 'once' }
+          : { duration: 'repeating', duration_in_months: 12 }),
+        name: `CultivAI Indicacao - 10% (${bonus.indicado_por || bonus.codigo})`,
+      });
+      discounts = [{ coupon: coupon.id }];
     }
+
+    // Os 3 meses extras sao ESTENDER o acesso, nao descontar valor:
+    // o periodo gratis vem antes da primeira cobranca. So no plano anual.
+    const diasGratis = bonus.tem && periodo === 'anual' ? 90 : undefined;
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
@@ -51,7 +84,10 @@ module.exports = async (req, res) => {
       success_url: `${origin}/?assinatura=sucesso`,
       cancel_url: `${origin}/?assinatura=cancelado`,
       metadata: { usuario_id: user.id },
-      subscription_data: { metadata: { usuario_id: user.id } },
+      subscription_data: {
+        metadata: { usuario_id: user.id, ...(bonus.tem ? { bonus_indicacao: bonus.codigo } : {}) },
+        ...(diasGratis ? { trial_period_days: diasGratis } : {}),
+      },
     });
 
     res.status(200).json({ url: session.url });
