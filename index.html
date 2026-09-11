@@ -593,25 +593,33 @@ return(<div style={{minHeight:'100vh',background:'transparent',maxWidth:430,marg
 <div style={{fontSize:14,fontWeight:800,color:'#1B4332'}}>Nenhum embaixador ainda</div>
 <div style={{fontSize:12.5,color:'#A3AD9D',marginTop:4,lineHeight:1.5}}>Cadastre o primeiro e mande o link dele. Tudo que ele indicar aparece aqui automaticamente</div></div>)}
 
-{dados.embaixadores.map(e=>(<div key={e.codigo} style={{...glass,padding:'14px 15px'}}>
-<div style={{display:'flex',alignItems:'center',gap:10}}>
+{dados.embaixadores.map(e=>(<div key={e.codigo} style={{...glass,padding:'18px 17px',borderRadius:18}}>
+<div style={{display:'flex',alignItems:'flex-start',gap:12}}>
+<div style={{width:46,height:46,borderRadius:14,background:'linear-gradient(140deg,#1B4332,#2F6B4A)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:18,fontWeight:800,color:'#fff'}}>{(e.nome||'?').trim().charAt(0).toUpperCase()}</div>
 <div style={{flex:1,minWidth:0}}>
-<div style={{display:'flex',alignItems:'center',gap:7}}>
-<div style={{fontSize:14.5,fontWeight:800,color:'#1B4332'}}>{e.nome}</div>
-{!e.ativo&&<span style={{fontSize:9.5,fontWeight:800,color:'#92400E',background:'#FEF3C7',borderRadius:20,padding:'2px 7px'}}>PAUSADO</span>}</div>
-<div style={{fontSize:11.5,color:'#A3AD9D',marginTop:1}}>{e.email}</div></div>
-<div style={{textAlign:'right',flexShrink:0}}>
-<div style={{fontSize:10,color:'#A3AD9D',fontWeight:600}}>A pagar</div>
-<div style={{fontSize:14,fontWeight:800,color:e.pendente>0?'#B45309':'#1B4332'}}>{fmt(e.pendente)}</div></div></div>
-<div style={{fontSize:11,color:'#A3AD9D',marginTop:9,lineHeight:1.45}}>Abriram o link → criaram conta → assinaram o Pro</div>
-<div style={{display:'flex',gap:6,marginTop:5}}>{[{l:'Cliques',v:e.cliques},{l:'Cadastros',v:e.cadastros},{l:'Assinantes',v:e.assinantes},{l:'Já pago',v:fmt(e.pago)}].map(b=>(
-<div key={b.l} style={{flex:1,background:'#F4F6F3',borderRadius:9,padding:'6px 8px',minWidth:0}}>
-<div style={{fontSize:9.5,color:'#8A9584',fontWeight:600}}>{b.l}</div>
-<div style={{fontSize:11.5,fontWeight:800,color:'#1B4332',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{b.v}</div></div>))}</div>
-<div style={{display:'flex',gap:7,marginTop:10}}>
-<button onClick={()=>copiarLink(e.codigo)} style={{flex:1,background:'#F0FDF4',border:'1px solid #86EFAC',borderRadius:10,padding:'9px',fontSize:12,fontWeight:800,color:'#15803D'}}>{copiado===e.codigo?'✓ Copiado':'Copiar link'}</button>
-<button onClick={()=>abrir(e.codigo)} style={{flex:1,background:'#fff',border:'1px solid #E2E9DE',borderRadius:10,padding:'9px',fontSize:12,fontWeight:700,color:'#5A6857'}}>{aberto===e.codigo?'Fechar':'Ver meses'}</button>
-<button onClick={()=>alternarAtivo(e.codigo,e.ativo)} style={{background:'#fff',border:'1px solid #E2E9DE',borderRadius:10,padding:'9px 11px',fontSize:12,fontWeight:700,color:e.ativo?'#B45309':'#15803D'}}>{e.ativo?'Pausar':'Ativar'}</button></div>
+<div style={{display:'flex',alignItems:'center',gap:7,flexWrap:'wrap'}}>
+<div style={{fontSize:17,fontWeight:800,color:'#1B4332'}}>{e.nome}</div>
+{e.ativo?<span style={{fontSize:10,fontWeight:800,color:'#15803D',background:'#DCFCE7',borderRadius:20,padding:'3px 9px'}}>ATIVO</span>
+:<span style={{fontSize:10,fontWeight:800,color:'#92400E',background:'#FEF3C7',borderRadius:20,padding:'3px 9px'}}>PAUSADO</span>}</div>
+<div style={{fontSize:13,color:'#8A9584',marginTop:3,wordBreak:'break-all'}}>{e.email}</div>
+<div style={{fontSize:12.5,color:'#15803D',fontWeight:700,marginTop:4}}>cultivai.app/?ref={e.codigo}</div></div></div>
+
+<div style={{background:e.pendente>0?'#FFFBEB':'#F4F6F3',border:e.pendente>0?'1px solid #FDE68A':'1px solid #E8ECE6',borderRadius:14,padding:'13px 15px',marginTop:14,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+<div><div style={{fontSize:12,fontWeight:700,color:e.pendente>0?'#92400E':'#8A9584',textTransform:'uppercase',letterSpacing:'.04em'}}>A pagar</div>
+<div style={{fontSize:11.5,color:'#A3AD9D',marginTop:2}}>Já pago: {fmt(e.pago)}</div></div>
+<div className='serif' style={{fontSize:24,fontWeight:800,color:e.pendente>0?'#B45309':'#1B4332'}}>{fmt(e.pendente)}</div></div>
+
+<div style={{fontSize:12.5,color:'#A3AD9D',marginTop:15,marginBottom:8,lineHeight:1.5}}>Abriram o link → criaram conta → assinaram o Pro</div>
+<div style={{display:'flex',gap:9}}>{[{l:'Cliques',v:e.cliques,ic:'👆',cor:'#F1EFE4'},{l:'Cadastros',v:e.cadastros,ic:'🌱',cor:'#EFF3EC'},{l:'Assinantes',v:e.assinantes,ic:'⭐',cor:'#F0FDF4'}].map(b=>(
+<div key={b.l} style={{flex:1,background:b.cor,borderRadius:14,padding:'12px 10px',minWidth:0,textAlign:'center'}}>
+<div style={{fontSize:15,marginBottom:3}}>{b.ic}</div>
+<div style={{fontSize:20,fontWeight:800,color:'#1B4332',lineHeight:1.1}}>{b.v}</div>
+<div style={{fontSize:11.5,color:'#8A9584',fontWeight:600,marginTop:3}}>{b.l}</div></div>))}</div>
+
+<div style={{display:'flex',gap:9,marginTop:15}}>
+<button onClick={()=>copiarLink(e.codigo)} style={{flex:1,background:copiado===e.codigo?'#DCFCE7':'#F0FDF4',border:'1.5px solid #86EFAC',borderRadius:13,padding:'13px 10px',fontSize:13.5,fontWeight:800,color:'#15803D'}}>{copiado===e.codigo?'✓ Copiado':'🔗 Copiar link'}</button>
+<button onClick={()=>abrir(e.codigo)} style={{flex:1,background:'#fff',border:'1.5px solid #E2E9DE',borderRadius:13,padding:'13px 10px',fontSize:13.5,fontWeight:700,color:'#5A6857'}}>{aberto===e.codigo?'Fechar':'📅 Ver meses'}</button>
+<button onClick={()=>alternarAtivo(e.codigo,e.ativo)} title={e.ativo?'Pausar':'Ativar'} style={{background:'#fff',border:'1.5px solid #E2E9DE',borderRadius:13,padding:'13px 14px',fontSize:15,color:e.ativo?'#B45309':'#15803D'}}>{e.ativo?'⏸':'▶'}</button></div>
 {aberto===e.codigo&&(<div style={{marginTop:12,borderTop:'1px solid #F0F4EE',paddingTop:10}}>
 {detalhe===undefined&&<div style={{fontSize:12,color:'#A3AD9D'}}>Carregando…</div>}
 {detalhe&&detalhe.meses.length===0&&<div style={{fontSize:12,color:'#A3AD9D'}}>Nenhuma comissão ainda.</div>}
