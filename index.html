@@ -545,15 +545,23 @@ return(<div style={{minHeight:'100vh',background:'transparent',maxWidth:430,marg
 
 {<div style={{...glass,padding:'14px 15px'}}>
 <button onClick={()=>setAjuda(!ajuda)} style={{width:'100%',background:'none',border:'none',padding:0,display:'flex',alignItems:'center',justifyContent:'space-between',cursor:'pointer'}}>
-<span style={{fontSize:13.5,fontWeight:800,color:'#1B4332'}}>❓ Como funciona o programa</span>
+<span style={{fontSize:15,fontWeight:800,color:'#1B4332',display:'flex',alignItems:'center',gap:7}}><span style={{fontSize:17}}>💡</span>Como funciona o programa</span>
 <span style={{color:'#8A9584',fontSize:14}}>{ajuda?'▴':'▾'}</span></button>
-{ajuda&&(<div style={{fontSize:12.5,color:'#3F5C48',lineHeight:1.65,marginTop:10}}>
-<p style={{margin:'0 0 9px'}}><b>1. Você cadastra o embaixador</b> e ele recebe um link só dele, tipo <b>cultivai.app/?ref=joao</b>.</p>
-<p style={{margin:'0 0 9px'}}><b>2. Ele divulga o link.</b> Quem abrir fica "marcado" como indicação dele por 60 dias, mesmo que demore pra criar conta.</p>
-<p style={{margin:'0 0 9px'}}><b>3. Quando a pessoa assina o Pro</b>, o embaixador passa a ganhar <b>30% do valor líquido</b> de cada mensalidade dela, por até <b>12 meses</b>.</p>
-<p style={{margin:'0 0 9px'}}>Líquido quer dizer: o valor que sobra depois da taxa do cartão. Se a mensalidade é R$ 30 e o cartão fica com R$ 2, a conta é 30% de R$ 28.</p>
-<p style={{margin:'0 0 9px'}}><b>4. Se a pessoa pedir reembolso</b>, a comissão daquele mês é cancelada sozinha, sem você precisar mexer.</p>
-<p style={{margin:0}}><b>5. Na hora de pagar</b>, abra "Ver meses" no embaixador, faça o Pix e toque em "Marcar pago". Isso atualiza o painel dele também.</p>
+{ajuda&&(<div style={{marginTop:13,display:'flex',flexDirection:'column',gap:9}}>
+{[{n:'1',icon:'👤',t:'Você cadastra o embaixador',d:<>Ele ganha um link só dele, tipo <b style={{color:'#1B4332'}}>cultivai.app/?ref=joao</b></>},
+{n:'2',icon:'📣',t:'Ele divulga o link',d:<>Quem abrir fica marcado como indicação dele por <b style={{color:'#1B4332'}}>60 dias</b>, mesmo que demore pra criar conta</>},
+{n:'3',icon:'💰',t:'A pessoa assina o Pro',d:<>Ele passa a ganhar <b style={{color:'#1B4332'}}>30% do valor líquido</b> de cada mensalidade dela, por até <b style={{color:'#1B4332'}}>12 meses</b></>},
+{n:'4',icon:'↩️',t:'Se pedirem reembolso',d:<>A comissão daquele mês é cancelada sozinha, sem você precisar mexer em nada</>},
+{n:'5',icon:'✅',t:'Na hora de pagar',d:<>Abra <b style={{color:'#1B4332'}}>Ver meses</b>, faça o Pix e toque em <b style={{color:'#1B4332'}}>Marcar pago</b>. O painel dele atualiza junto</>}].map(p=>(
+<div key={p.n} style={{background:'#F7F9F6',border:'1px solid #E8ECE6',borderRadius:14,padding:'13px 14px',display:'flex',gap:12,alignItems:'flex-start'}}>
+<div style={{width:30,height:30,borderRadius:'50%',background:'#1B4332',color:'#fff',fontSize:13.5,fontWeight:800,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>{p.n}</div>
+<div style={{flex:1,minWidth:0}}>
+<div style={{fontSize:14,fontWeight:800,color:'#1B4332',display:'flex',alignItems:'center',gap:6}}><span style={{fontSize:15}}>{p.icon}</span>{p.t}</div>
+<div style={{fontSize:13,color:'#5A6857',lineHeight:1.6,marginTop:4}}>{p.d}</div></div></div>))}
+<div style={{background:'#F0FDF4',border:'1px solid #BBF7D0',borderRadius:14,padding:'13px 14px',display:'flex',gap:11,alignItems:'flex-start'}}>
+<span style={{fontSize:17,flexShrink:0}}>🧮</span>
+<div><div style={{fontSize:13,fontWeight:800,color:'#15803D'}}>O que é "valor líquido"</div>
+<div style={{fontSize:13,color:'#3F5C48',lineHeight:1.6,marginTop:3}}>É o que sobra depois da taxa do cartão. Se a mensalidade é R$ 30 e o cartão fica com R$ 2, a comissão é 30% de R$ 28.</div></div></div>
 </div>)}</div>}
 {!form&&<button onClick={()=>setForm(true)} style={{width:'100%',background:'#1B4332',border:'none',borderRadius:13,padding:'14px',fontSize:14,fontWeight:800,color:'#fff'}}>+ Cadastrar embaixador</button>}
 {form&&(<div style={{...glass,padding:16}}>
