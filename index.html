@@ -300,10 +300,29 @@ out.push({x:x+Math.cos(a)*o,y:y+Math.sin(a)*o,z:(rnd()-0.5)*0.30});}
 while(out.length<N){const t=rnd();const a=a0;
 out.push({x:RX*Math.cos(a)+0.03*(rnd()*2-1)+0.02*t,y:bcy+RY*Math.sin(a)-0.10*t,z:(rnd()-0.5)*0.1});}
 return out;})();
+const uva=(()=>{const out=[];const linhas=[[-0.30,4],[-0.11,4],[0.08,3],[0.27,2],[0.45,1]];
+const rb=0.135,esp=rb*1.95;const bagas=[];
+linhas.forEach(L=>{const larg=(L[1]-1)*esp;for(let k=0;k<L[1];k++)bagas.push([-larg/2+k*esp,L[0]]);});
+const ncacho=Math.round(N*0.84);
+while(out.length<ncacho){const b=bagas[Math.floor(rnd()*bagas.length)];
+const a=rnd()*2*Math.PI,rr=rb*Math.sqrt(rnd());
+out.push({x:b[0]+Math.cos(a)*rr,y:b[1]+Math.sin(a)*rr,z:(rnd()-0.5)*0.40});}
+const ns=Math.round(N*0.06);
+for(let i=0;i<ns;i++){const t=i/Math.max(1,ns-1);out.push({x:0.012*(rnd()*2-1),y:-0.45-0.33*t,z:0.05});}
+const ang=-42*Math.PI/180,ca=Math.cos(ang),sa=Math.sin(ang);let g=0;
+while(out.length<N&&g++<N*60){const u=rnd(),W=0.15;const x=(rnd()*2-1)*W;
+if(Math.abs(x)<=W*Math.pow(Math.sin(Math.PI*u),0.8)){const ly=-0.19+0.38*u;
+out.push({x:0.27+x*ca-ly*sa,y:-0.80+x*sa+ly*ca,z:0.05});}}
+while(out.length<N)out.push({x:0,y:0,z:0});return out;})();
+// Cada micro ponto adota o destino de um ponto principal, com um leve deslocamento:
+// é o que faz a folha/fruta/arvore aparecerem cheias em vez de ralas.
+const mapMicro=new Uint16Array(M),jitX=new Float32Array(M),jitY=new Float32Array(M),jitZ=new Float32Array(M);
+for(let i=0;i<M;i++){mapMicro[i]=Math.floor(rnd()*N);
+jitX[i]=(rnd()-0.5)*0.055;jitY[i]=(rnd()-0.5)*0.055;jitZ[i]=(rnd()-0.5)*0.055;}
 const R=size*0.36,cx=size/2,cy=size/2,dotScale=size/130;
 // Verde CultivAI de cima pra baixo; a frutinha puxa pro vermelho do morango.
 const stops=[[190,255,120],[74,240,120],[16,185,90],[13,90,60]];
-const COR_FOLHA=[90,240,120],COR_FRUTA=[255,60,80],COR_LOGO=[38,78,56],COR_ARVORE=[70,200,110],COR_BANANA=[250,205,60];
+const COR_FOLHA=[90,240,120],COR_FRUTA=[255,60,80],COR_LOGO=[38,78,56],COR_ARVORE=[70,200,110],COR_BANANA=[250,205,60],COR_UVA=[176,128,236];
 const baseRGB=new Float32Array(TOTAL*3);const sizeMul=new Float32Array(TOTAL);
 for(let i=0;i<TOTAL;i++){const p=i<N?pts[i]:micro[i-N];sizeMul[i]=i>=N?0.5:1;
 const t=(p.y+1)/2;const seg=t*(stops.length-1);const s=Math.max(0,Math.min(stops.length-2,Math.floor(seg)));const f=seg-s;
@@ -311,7 +330,7 @@ baseRGB[i*3]=stops[s][0]+(stops[s+1][0]-stops[s][0])*f;
 baseRGB[i*3+1]=stops[s][1]+(stops[s+1][1]-stops[s][1])*f;
 baseRGB[i*3+2]=stops[s][2]+(stops[s+1][2]-stops[s][2])*f;}
 // Ciclo: gira → vira folha → segura → volta → gira → vira frutinha → segura → volta
-const SPIN=2.4,MORPH=0.95,HOLD=1.5;const META=SPIN+MORPH+HOLD+MORPH;const CICLO=META*5;
+const SPIN=2.4,MORPH=0.95,HOLD=1.5;const META=SPIN+MORPH+HOLD+MORPH;const CICLO=META*6;
 function ease(x){return x<0.5?2*x*x:1-Math.pow(-2*x+2,2)/2;}
 function estado(time){const t=time%CICLO;const seg=Math.floor(t/META);const u=t-seg*META;
 let m;if(u<SPIN)m=0;else if(u<SPIN+MORPH)m=ease((u-SPIN)/MORPH);else if(u<SPIN+MORPH+HOLD)m=1;else m=ease(1-(u-SPIN-MORPH-HOLD)/MORPH);
@@ -320,21 +339,23 @@ const sxA=new Float32Array(TOTAL),syA=new Float32Array(TOTAL),szA=new Float32Arr
 const order=new Uint16Array(TOTAL);for(let i=0;i<TOTAL;i++)order[i]=i;
 let raf=0,rodando=true;const inicio=performance.now();
 function frame(now){if(!rodando||!ctx)return;const time=(now-inicio)/1000;ctx.clearRect(0,0,size,size);
-const st=estado(time);const morph=st.morph;const FORMAS=[folha,fruta,arvore,banana,logo];const CORES=[COR_FOLHA,COR_FRUTA,COR_ARVORE,COR_BANANA,COR_LOGO];const alvos=FORMAS[st.forma];const corMorph=CORES[st.forma];
+const st=estado(time);const morph=st.morph;const FORMAS=[folha,fruta,arvore,banana,uva,logo];const CORES=[COR_FOLHA,COR_FRUTA,COR_ARVORE,COR_BANANA,COR_UVA,COR_LOGO];const alvos=FORMAS[st.forma];const corMorph=CORES[st.forma];
 const ay=time*0.5*(1-morph);const ca=Math.cos(ay),sa=Math.sin(ay);
 for(let i=0;i<TOTAL;i++){const p=i<N?pts[i]:micro[i-N];
 const x=p.x*ca-p.z*sa,z=p.x*sa+p.z*ca,y=p.y;
 const onda=1+0.12*Math.sin(y*6+time*2.2)+0.06*Math.cos(x*5-time*1.6);
 let px=x*onda,py=y*onda,pz=z*onda;
-if(morph>0&&i<N){const tg=alvos[i];px+=(tg.x-px)*morph;py+=(tg.y-py)*morph;pz+=(tg.z-pz)*morph;}
+if(morph>0){if(i<N){const tg=alvos[i];px+=(tg.x-px)*morph;py+=(tg.y-py)*morph;pz+=(tg.z-pz)*morph;}
+else{const k=i-N;const tg=alvos[mapMicro[k]];
+px+=(tg.x+jitX[k]-px)*morph;py+=(tg.y+jitY[k]-py)*morph;pz+=(tg.z+jitZ[k]-pz)*morph;}}
 sxA[i]=px;syA[i]=py;szA[i]=pz;}
 order.sort((a,b)=>szA[a]-szA[b]);
-const kMorph=morph*0.85;const microAlpha=Math.max(0,1-morph*1.15);
+const kMorph=morph*0.85;const microAlpha=1;
 for(let oi=0;oi<TOTAL;oi++){const i=order[oi];const depth=(szA[i]+1)/2;
 const px=cx+sxA[i]*R,py=cy+syA[i]*R;
 const rad=(0.6+depth*1.2)*dotScale*sizeMul[i]*0.5;
 let r=baseRGB[i*3],g=baseRGB[i*3+1],b0=baseRGB[i*3+2];
-if(kMorph>0&&i<N){r+=(corMorph[0]-r)*kMorph;g+=(corMorph[1]-g)*kMorph;b0+=(corMorph[2]-b0)*kMorph;}
+if(kMorph>0){r+=(corMorph[0]-r)*kMorph;g+=(corMorph[1]-g)*kMorph;b0+=(corMorph[2]-b0)*kMorph;}
 const b=0.82+depth*0.28;const alpha=(0.95+depth*0.05)*(isMicro[i]?microAlpha:1);
 ctx.fillStyle=`rgba(${(r*b)|0},${(g*b)|0},${(b0*b)|0},${alpha})`;
 if(rad<0.9){const d2=rad*2;ctx.fillRect(px-rad,py-rad,d2,d2);}
