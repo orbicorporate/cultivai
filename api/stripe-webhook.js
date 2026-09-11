@@ -154,8 +154,17 @@ module.exports = async (req, res) => {
           const pagoEm = invoice.status_transitions && invoice.status_transitions.paid_at
             ? new Date(invoice.status_transitions.paid_at * 1000).toISOString()
             : new Date().toISOString();
+          // Descobre se a fatura e de plano mensal ou anual
+          let periodoPlano = null;
+          try {
+            const li = invoice.lines && invoice.lines.data && invoice.lines.data[0];
+            const rec = li && (li.price ? li.price.recurring : (li.plan || null));
+            if (rec && rec.interval) periodoPlano = rec.interval === 'year' ? 'anual' : 'mensal';
+          } catch (e) {}
+
           const r = await rpc('rpc_registrar_comissao', {
             p_segredo: process.env.AFILIADO_WEBHOOK_SEGREDO,
+            p_periodo: periodoPlano,
             p_usuario_id: usuarioId,
             p_customer_id: typeof invoice.customer === 'string' ? invoice.customer : (invoice.customer && invoice.customer.id),
             p_invoice_id: invoice.id,
