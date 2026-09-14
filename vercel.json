@@ -5,6 +5,14 @@
       "destination": "/presente.html"
     },
     {
+      "source": "/presente7",
+      "destination": "/presente-7.html"
+    },
+    {
+      "source": "/presente30",
+      "destination": "/presente-30.html"
+    },
+    {
       "source": "/((?!api/|suporte\\.html|privacidade\\.html|presente).*)",
       "destination": "/index.html"
     }
