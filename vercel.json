@@ -1,7 +1,11 @@
 {
   "rewrites": [
     {
-      "source": "/((?!api/|suporte\\.html|privacidade\\.html).*)",
+      "source": "/presente",
+      "destination": "/presente.html"
+    },
+    {
+      "source": "/((?!api/|suporte\\.html|privacidade\\.html|presente).*)",
       "destination": "/index.html"
     }
   ],
