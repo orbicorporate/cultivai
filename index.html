@@ -611,10 +611,12 @@ async function verResgates(cod){if(aberto===cod){setAberto(null);setResgates(nul
 setAberto(cod);setResgates(undefined);
 const{data}=await sb.rpc('rpc_admin_voucher_resgates',{p_codigo:cod});setResgates(data||[]);}
 async function alternar(cod,ativo){await sb.rpc('rpc_admin_voucher_estado',{p_codigo:cod,p_ativo:!ativo});carregar();}
-function copiar(cod){const l=`https://cultivai.app/presente?c=${cod}`;navigator.clipboard&&navigator.clipboard.writeText(l).then(()=>{setCopiado(cod);setTimeout(()=>setCopiado(''),1800);});}
+function paginaDe(d){return d<=7?'presente7':(d<=30?'presente30':'presente');}
+function linkDe(cod,d){return`https://cultivai.app/${paginaDe(d)}?c=${cod}`;}
+function copiar(cod,d){const l=linkDe(cod,d);navigator.clipboard&&navigator.clipboard.writeText(l).then(()=>{setCopiado(cod);setTimeout(()=>setCopiado(''),1800);});}
 const glass={background:'linear-gradient(152deg, rgba(255,255,255,.95) 0%, rgba(255,255,255,.74) 20%, rgba(255,255,255,.86) 38%, rgba(250,252,249,.72) 66%, rgba(255,255,255,.8) 100%)',backdropFilter:'blur(22px) saturate(185%)',WebkitBackdropFilter:'blur(22px) saturate(185%)',borderRadius:18,boxShadow:'0 14px 38px -14px rgba(11,45,31,.24), 0 3px 10px -4px rgba(11,45,31,.10), inset 0 1px 0 rgba(255,255,255,.92)'};
 const inp={width:'100%',boxSizing:'border-box',padding:'11px 13px',borderRadius:11,border:'1px solid #E2E9DE',background:'#fff',fontSize:14,fontFamily:'inherit',color:'#1B4332',outline:'none',marginTop:6};
-const DURACOES=[{d:7,l:'7 dias'},{d:30,l:'30 dias'},{d:90,l:'3 meses'},{d:365,l:'1 ano'}];
+const DURACOES=[{d:7,l:'7 dias'},{d:30,l:'30 dias'},{d:365,l:'1 ano'}];
 const dt=v=>v?new Date(v).toLocaleDateString('pt-BR'):'-';
 return(<div style={{minHeight:'100vh',maxWidth:430,margin:'0 auto',paddingBottom:70}}>
 <div style={{padding:'20px 22px 0',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
@@ -630,6 +632,7 @@ return(<div style={{minHeight:'100vh',maxWidth:430,margin:'0 auto',paddingBottom
 <div style={{fontSize:11,color:'#A3AD9D'}}>So pra voce identificar depois</div>
 <input value={titulo} onChange={e=>setTitulo(e.target.value)} placeholder='Ex: 1 ano gratis - feira agro' style={inp} /></div>
 <div style={{marginTop:13}}><div style={{fontSize:12,fontWeight:700,color:'#5A6857'}}>Quanto tempo de Pro</div>
+<div style={{fontSize:11,color:'#A3AD9D'}}>Cada opção tem a arte própria no compartilhamento</div>
 <div style={{display:'flex',gap:6,marginTop:7}}>{DURACOES.map(x=>(
 <button key={x.d} onClick={()=>setDias(x.d)} style={{flex:1,padding:'10px 4px',borderRadius:10,border:dias===x.d?'1.5px solid #1B4332':'1px solid #E2E9DE',background:dias===x.d?'#1B4332':'#fff',color:dias===x.d?'#fff':'#5A6857',fontSize:12,fontWeight:700,outline:'none'}}>{x.l}</button>))}</div></div>
 <div style={{marginTop:13}}><div style={{fontSize:12,fontWeight:700,color:'#5A6857'}}>Estoque</div>
@@ -660,9 +663,9 @@ return(<div style={{minHeight:'100vh',maxWidth:430,margin:'0 auto',paddingBottom
 <div style={{marginTop:11,height:7,borderRadius:99,background:'#EFF3EC',overflow:'hidden'}}>
 <div style={{height:'100%',width:`${pct}%`,background:fim?'#EF4444':'#4ADE80',borderRadius:99}} /></div>
 <div style={{fontSize:11,color:'#A3AD9D',marginTop:5}}>{v.usados} de {v.estoque} resgatados · {v.ativos_agora} com acesso valendo agora</div>
-<div onClick={()=>copiar(v.codigo)} style={{marginTop:11,background:'rgba(27,67,50,.04)',border:'1px solid rgba(27,67,50,.09)',borderRadius:12,padding:'10px 12px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:9,cursor:'pointer'}}>
+<div onClick={()=>copiar(v.codigo,v.dias)} style={{marginTop:11,background:'rgba(27,67,50,.04)',border:'1px solid rgba(27,67,50,.09)',borderRadius:12,padding:'10px 12px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:9,cursor:'pointer'}}>
 <div style={{minWidth:0}}><div style={{fontSize:9,fontWeight:700,color:'#A3AD9D',textTransform:'uppercase',letterSpacing:'.12em'}}>Link do presente</div>
-<div style={{fontSize:12.5,fontWeight:700,color:'#2F5233',marginTop:2,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>cultivai.app/presente?c={v.codigo}</div></div>
+<div style={{fontSize:12.5,fontWeight:700,color:'#2F5233',marginTop:2,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>cultivai.app/{paginaDe(v.dias)}?c={v.codigo}</div></div>
 <span style={{fontSize:10.5,fontWeight:800,color:copiado===v.codigo?'#15803D':'#8A9584',flexShrink:0,letterSpacing:'.06em'}}>{copiado===v.codigo?'COPIADO':'COPIAR'}</span></div>
 <div style={{display:'flex',gap:8,marginTop:10}}>
 <button onClick={()=>verResgates(v.codigo)} style={{flex:1,background:'#16311F',border:'none',outline:'none',borderRadius:12,padding:'12px',fontSize:11.5,fontWeight:800,color:'#F7F9F6',letterSpacing:'.06em'}}>{aberto===v.codigo?'FECHAR':'QUEM RESGATOU'}</button>
