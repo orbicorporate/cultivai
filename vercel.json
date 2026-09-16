@@ -13,7 +13,11 @@
       "destination": "/presente-30.html"
     },
     {
-      "source": "/((?!api/|suporte\\.html|privacidade\\.html|presente).*)",
+      "source": "/embaixadores",
+      "destination": "/embaixadores.html"
+    },
+    {
+      "source": "/((?!api/|suporte\\.html|privacidade\\.html|presente|embaixadores).*)",
       "destination": "/index.html"
     }
   ],
