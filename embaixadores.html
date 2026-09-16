@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seja Embaixador CultivAI</title>
+<meta name="description" content="Indique o CultivAI, o produtor assina, e você ganha 30% de cada mensalidade por 12 meses.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CultivAI">
+<meta property="og:title" content="Seja Embaixador CultivAI">
+<meta property="og:description" content="Indique o CultivAI, o produtor assina, e você ganha 30% de cada mensalidade por 12 meses. Quem entra pelo seu link ainda leva 10% de desconto e 3 meses extras.">
+<meta property="og:image" content="https://raw.githubusercontent.com/orbicorporate/cultivai/main/og-image.jpg?v=3">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/orbicorporate/cultivai/main/og-image.jpg?v=3">
+<link rel="icon" href="https://raw.githubusercontent.com/orbicorporate/cultivai/main/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;background:#F4F6F3;color:#1B4332;font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased}
+.serif{font-family:'Inter',sans-serif;letter-spacing:-0.02em}
+main{max-width:520px;margin:0 auto;padding:26px 20px 60px}
+.card{background:linear-gradient(152deg,rgba(255,255,255,.95) 0%,rgba(255,255,255,.74) 20%,rgba(255,255,255,.86) 38%,rgba(250,252,249,.72) 66%,rgba(255,255,255,.8) 100%);
+backdrop-filter:blur(22px) saturate(185%);-webkit-backdrop-filter:blur(22px) saturate(185%);
+border-radius:26px;box-shadow:0 14px 38px -14px rgba(11,45,31,.24),0 3px 10px -4px rgba(11,45,31,.10),inset 0 1px 0 rgba(255,255,255,.92)}
+.sobe{opacity:0;transform:translateY(14px);animation:sobe .6s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes sobe{to{opacity:1;transform:none}}
+.selo{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#F7E7A6,#D4A017 55%,#A87B12);
+border-radius:20px;padding:4px 11px;font-size:10px;font-weight:800;color:#4A3508;letter-spacing:.11em;
+box-shadow:0 2px 6px -2px rgba(168,123,18,.6),inset 0 1px 0 rgba(255,255,255,.6)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:34px;background:transparent}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:99px;background:linear-gradient(90deg,#1B4332 var(--p,50%),#E2E9DE var(--p,50%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:-10px;border-radius:50%;
+background:#fff;border:3px solid #1B4332;box-shadow:0 3px 10px -2px rgba(11,45,31,.45);cursor:pointer}
+input[type=range]::-moz-range-track{height:8px;border-radius:99px;background:#E2E9DE}
+input[type=range]::-moz-range-progress{height:8px;border-radius:99px;background:#1B4332}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid #1B4332;cursor:pointer}
+.num{font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<main>
+
+  <div class="sobe" style="display:flex;align-items:center;gap:10px">
+    <img src="https://raw.githubusercontent.com/orbicorporate/cultivai/main/icon-192.png" style="width:36px;height:36px;border-radius:11px" alt="">
+    <span class="serif" style="font-size:19px;font-weight:800">CultivAI</span>
+    <span class="selo">♛ EMBAIXADOR</span>
+  </div>
+
+  <div class="card sobe" style="margin-top:20px;padding:34px 24px;text-align:center;animation-delay:.06s">
+    <div style="font-size:11px;font-weight:700;color:#A3AD9D;text-transform:uppercase;letter-spacing:.12em">Programa de parceria</div>
+    <h1 class="serif" style="margin:12px 0 0;font-size:31px;font-weight:800;line-height:1.1">
+      Indique. Ele planta.<br>Você ganha.
+    </h1>
+    <p style="margin:12px auto 0;max-width:400px;font-size:15px;line-height:1.6;color:#5A6857">
+      Você indica o CultivAI pra quem vive do campo e recebe <b style="color:#1B4332">30% de cada mensalidade</b> que essa pessoa pagar, por até 12 meses.
+    </p>
+  </div>
+
+  <!-- Simulador -->
+  <div class="card sobe" style="margin-top:14px;padding:26px 22px;animation-delay:.12s">
+    <div style="text-align:center;font-size:11px;font-weight:700;color:#A3AD9D;text-transform:uppercase;letter-spacing:.12em">Simule seu ganho</div>
+    <div class="serif num" id="valor" style="margin-top:12px;text-align:center;font-size:44px;font-weight:800;line-height:1;letter-spacing:-.03em">R$ 0</div>
+    <div id="rotulo" style="margin-top:6px;text-align:center;font-size:13.5px;color:#8A9584">no total, ao longo de 12 meses</div>
+
+    <div style="margin-top:22px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between">
+        <span class="num" id="qtd" style="font-size:15px;font-weight:700">10</span>
+        <span style="font-size:12px;color:#A3AD9D">produtores indicados</span>
+      </div>
+      <input type="range" id="slider" min="1" max="300" step="1" value="10" aria-label="Quantidade de produtores indicados">
+      <div style="display:flex;justify-content:space-between;font-size:10.5px;color:#B6BFB1;margin-top:-4px">
+        <span>1</span><span>300</span>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:9px;margin-top:6px">
+      <button id="bt-mensal" style="flex:1;padding:11px 6px;border-radius:12px;border:none;font-size:12.5px;font-weight:800;background:#1B4332;color:#fff">Assinam o mensal</button>
+      <button id="bt-anual" style="flex:1;padding:11px 6px;border-radius:12px;border:1px solid #E2E9DE;font-size:12.5px;font-weight:700;background:#fff;color:#5A6857">Assinam o anual</button>
+    </div>
+
+    <div style="margin-top:14px;background:rgba(255,255,255,.7);border-radius:16px;padding:13px 15px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12.5px;color:#8A9584">Por produtor indicado</span>
+        <span class="serif num" id="unit" style="font-size:17px;font-weight:800">R$ 0</span>
+      </div>
+      <div id="detalhe" style="font-size:11.5px;color:#A3AD9D;margin-top:4px;line-height:1.5"></div>
+    </div>
+
+    <p style="margin:13px 0 0;text-align:center;font-size:11px;line-height:1.6;color:#B6BFB1">
+      Contas sobre o valor líquido, já sem a taxa do cartão. Mensal R$ 36 e anual R$ 297, com o desconto de 10% do seu link já aplicado.
+    </p>
+  </div>
+
+  <!-- Bônus de quem é indicado -->
+  <div class="sobe" style="margin-top:14px;display:flex;align-items:center;gap:13px;background:#E6F6EB;border-radius:22px;padding:18px">
+    <span style="flex-shrink:0;width:44px;height:44px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px">🎁</span>
+    <div>
+      <div style="font-size:14.5px;font-weight:800;color:#15803D">Quem você indica também ganha</div>
+      <div style="font-size:13px;line-height:1.5;color:#1F7A3D;margin-top:2px">
+        Pelo seu link ele leva <b>10% de desconto</b> e, no plano anual, <b>3 meses extras</b>: paga 12, usa 15. Isso ajuda muito na hora de fechar.
+      </div>
+    </div>
+  </div>
+
+  <!-- Como funciona -->
+  <div class="sobe" style="margin-top:28px;animation-delay:.18s">
+    <div style="font-size:11px;font-weight:700;color:#A3AD9D;text-transform:uppercase;letter-spacing:.12em">Como funciona</div>
+    <div id="passos" style="margin-top:12px;display:flex;flex-direction:column;gap:9px"></div>
+  </div>
+
+  <!-- Painel -->
+  <div class="card sobe" style="margin-top:20px;padding:24px 22px;animation-delay:.3s">
+    <div class="serif" style="font-size:18px;font-weight:800">Você acompanha tudo por um painel</div>
+    <p style="margin:7px 0 0;font-size:14px;line-height:1.6;color:#5A6857">
+      Junto com o link você recebe um painel só seu, que abre no celular com o seu e-mail. Nele aparece:
+    </p>
+    <div id="lista" style="margin-top:13px;display:flex;flex-direction:column;gap:9px"></div>
+    <p style="margin:15px 0 0;font-size:12.5px;line-height:1.6;color:#A3AD9D">
+      Os valores vêm direto das faturas, sem lançamento manual. O pagamento sai por Pix até o dia 10 do mês seguinte, com 30 dias de carência pra cobrir eventuais reembolsos.
+    </p>
+  </div>
+
+  <div class="card sobe" style="margin-top:16px;padding:26px 22px;text-align:center;animation-delay:.36s">
+    <div class="serif" style="font-size:19px;font-weight:800">Bora plantar isso junto?</div>
+    <p style="margin:8px auto 0;max-width:380px;font-size:14px;line-height:1.6;color:#5A6857">
+      Fale com quem te enviou esta página. Em poucos minutos você recebe seu link e seu painel, e já pode começar a indicar.
+    </p>
+    <a href="https://cultivai.app" style="display:inline-block;margin-top:16px;background:#1B4332;color:#fff;text-decoration:none;padding:14px 26px;border-radius:14px;font-size:14px;font-weight:800">Conhecer o CultivAI</a>
+  </div>
+
+  <p style="margin-top:26px;text-align:center;font-size:12px;color:#B6BFB1">
+    CultivAI, a inteligência que planeja a lavoura com o produtor.
+  </p>
+</main>
+
+<script>
+(function(){
+  var PASSOS=[
+    {n:1,t:'Compartilhe seu link',d:'A gente te dá um link exclusivo. Mande pra quem vive do campo: cliente, vizinho, grupo de produtores, seu público.'},
+    {n:2,t:'A pessoa conhece e assina',d:'Quem abrir seu link fica ligado a você por 60 dias, mesmo que demore pra criar conta. Quando assinar, entra como sua indicação.'},
+    {n:3,t:'Você ganha 30%',d:'De cada mensalidade que ela pagar, por até 12 meses. No plano anual você recebe de uma vez, logo na primeira cobrança.'},
+    {n:4,t:'E vai somando',d:'Cada nova indicação soma às anteriores. Quanto mais produtores ativos, maior o seu ganho no mês.'}
+  ];
+  var ITENS=[
+    'Quanto você tem pra receber, atualizado na hora.',
+    'Quantas pessoas abriram o link, criaram conta e assinaram.',
+    'Quem indicou cada assinatura, com data e plano.',
+    'Quanto entrou de comissão em cada mês, com extrato por fatura.'
+  ];
+  var passos=document.getElementById('passos');
+  PASSOS.forEach(function(p,i){
+    var d=document.createElement('div');
+    d.className='sobe';
+    d.style.cssText='display:flex;align-items:flex-start;gap:13px;border:1px solid #E8ECE6;background:#fff;border-radius:22px;padding:17px;animation-delay:'+(220+i*60)+'ms';
+    d.innerHTML='<span style="flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#1B4332;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14.5px;font-weight:800">'+p.n+'</span>'+
+      '<div style="min-width:0"><div style="font-size:15.5px;font-weight:800;line-height:1.25">'+p.t+'</div>'+
+      '<div style="margin-top:4px;font-size:13.5px;line-height:1.6;color:#5A6857">'+p.d+'</div></div>';
+    passos.appendChild(d);
+  });
+  var lista=document.getElementById('lista');
+  ITENS.forEach(function(t){
+    var d=document.createElement('div');
+    d.style.cssText='display:flex;align-items:flex-start;gap:10px';
+    d.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><path d="M20 6L9 17l-5-5"/></svg>'+
+      '<span style="font-size:13.5px;line-height:1.55;color:#5A6857">'+t+'</span>';
+    lista.appendChild(d);
+  });
+
+  // ---- Simulador ----
+  // Valores reais do app, com o desconto de 10% do link do embaixador.
+  var TAXA_PCT=0.0399, TAXA_FIXA=0.39, COMISSAO=0.30;
+  function liquido(bruto){ return Math.max(0, bruto - (bruto*TAXA_PCT + TAXA_FIXA)); }
+  var MENSAL=36*0.9, ANUAL=297*0.9;
+  var ganhoMensal = liquido(MENSAL)*COMISSAO*12;   // 12 faturas dentro da janela
+  var ganhoAnual  = liquido(ANUAL)*COMISSAO;       // uma fatura só
+
+  var modo='mensal';
+  var slider=document.getElementById('slider');
+  var elValor=document.getElementById('valor'), elQtd=document.getElementById('qtd');
+  var elUnit=document.getElementById('unit'), elDet=document.getElementById('detalhe');
+  var elRot=document.getElementById('rotulo');
+  var btM=document.getElementById('bt-mensal'), btA=document.getElementById('bt-anual');
+
+  function brl(v){ return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}); }
+
+  var animAlvo=0, animAtual=0, raf=0;
+  function anima(alvo){
+    animAlvo=alvo; cancelAnimationFrame(raf);
+    var de=animAtual, t0=performance.now();
+    (function passo(t){
+      var p=Math.min(1,(t-t0)/380), e=1-Math.pow(1-p,3);
+      animAtual=Math.round(de+(animAlvo-de)*e);
+      elValor.textContent=brl(animAtual);
+      if(p<1) raf=requestAnimationFrame(passo);
+    })(t0);
+  }
+
+  function atualizar(){
+    var n=Number(slider.value);
+    slider.style.setProperty('--p',((n-1)/299*100)+'%');
+    elQtd.textContent=n.toLocaleString('pt-BR');
+    var unit = modo==='mensal' ? ganhoMensal : ganhoAnual;
+    anima(Math.round(unit*n));
+    elUnit.textContent=brl(unit);
+    if(modo==='mensal'){
+      elRot.textContent='no total, ao longo de 12 meses';
+      elDet.textContent='Cerca de '+brl(liquido(MENSAL)*COMISSAO)+' por mês, durante 12 meses, para cada produtor que continuar assinando.';
+    }else{
+      elRot.textContent='recebidos de uma vez';
+      elDet.textContent='O anual é cobrado de uma vez, então sua comissão cai logo na primeira fatura, sem esperar mês a mês.';
+    }
+  }
+  function marcar(){
+    var on='flex:1;padding:11px 6px;border-radius:12px;border:none;font-size:12.5px;font-weight:800;background:#1B4332;color:#fff';
+    var off='flex:1;padding:11px 6px;border-radius:12px;border:1px solid #E2E9DE;font-size:12.5px;font-weight:700;background:#fff;color:#5A6857';
+    btM.style.cssText = modo==='mensal'?on:off;
+    btA.style.cssText = modo==='anual'?on:off;
+  }
+  btM.onclick=function(){modo='mensal';marcar();atualizar();};
+  btA.onclick=function(){modo='anual';marcar();atualizar();};
+  slider.oninput=atualizar;
+  marcar(); atualizar();
+})();
+</script>
+</body>
+</html>
