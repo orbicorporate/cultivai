@@ -634,7 +634,7 @@ return(<div style={{marginTop:12,background:'rgba(255,255,255,.62)',border:'1px 
 </div></>)}</div>)}</div>);}
 function PresentesScreen({onSair}){const[lista,setLista]=useState(undefined);const[form,setForm]=useState(false);
 const[titulo,setTitulo]=useState('');const[dias,setDias]=useState(365);const[estoque,setEstoque]=useState(10);
-const[salvando,setSalvando]=useState(false);const[erro,setErro]=useState('');const[copiado,setCopiado]=useState('');
+const[salvando,setSalvando]=useState(false);const[erro,setErro]=useState('');const[copiado,setCopiado]=useState('');const[confirmar,setConfirmar]=useState('');const[apagando,setApagando]=useState('');const[erroApagar,setErroApagar]=useState('');
 const[aberto,setAberto]=useState(null);const[resgates,setResgates]=useState(null);
 function carregar(){sb.rpc('rpc_admin_vouchers').then(({data,error})=>setLista(error?null:(data||[])));}
 useEffect(()=>{carregar();},[]);
@@ -646,6 +646,10 @@ async function verResgates(cod){if(aberto===cod){setAberto(null);setResgates(nul
 setAberto(cod);setResgates(undefined);
 const{data}=await sb.rpc('rpc_admin_voucher_resgates',{p_codigo:cod});setResgates(data||[]);}
 async function alternar(cod,ativo){await sb.rpc('rpc_admin_voucher_estado',{p_codigo:cod,p_ativo:!ativo});carregar();}
+async function apagar(cod){setApagando(cod);setErroApagar('');const{data,error}=await sb.rpc('rpc_admin_apagar_voucher',{p_codigo:cod});setApagando('');
+if(error){setErroApagar('Nao consegui apagar: '+error.message);return;}
+if(data&&data.ok===false){setErroApagar(data.erro==='sem_permissao'?'Sua conta nao tem permissao pra apagar presentes.':(data.erro||'Nao consegui apagar.'));return;}
+setConfirmar('');carregar();}
 function paginaDe(d){return d<=7?'presente7':(d<=30?'presente30':'presente');}
 function linkDe(cod,d){return`https://cultivai.app/${paginaDe(d)}?c=${cod}`;}
 function copiar(cod,d){const l=linkDe(cod,d);navigator.clipboard&&navigator.clipboard.writeText(l).then(()=>{setCopiado(cod);setTimeout(()=>setCopiado(''),1800);});}
@@ -704,7 +708,16 @@ return(<div style={{minHeight:'100vh',maxWidth:430,margin:'0 auto',paddingBottom
 <span style={{fontSize:10.5,fontWeight:800,color:copiado===v.codigo?'#15803D':'#8A9584',flexShrink:0,letterSpacing:'.06em'}}>{copiado===v.codigo?'COPIADO':'COPIAR'}</span></div>
 <div style={{display:'flex',gap:8,marginTop:10}}>
 <button onClick={()=>verResgates(v.codigo)} style={{flex:1,background:'#16311F',border:'none',outline:'none',borderRadius:12,padding:'12px',fontSize:11.5,fontWeight:800,color:'#F7F9F6',letterSpacing:'.06em'}}>{aberto===v.codigo?'FECHAR':'QUEM RESGATOU'}</button>
-<button onClick={()=>alternar(v.codigo,v.ativo)} style={{background:'#fff',border:'1px solid #E2E9DE',outline:'none',borderRadius:12,padding:'12px 15px',fontSize:11.5,fontWeight:800,color:v.ativo?'#B45309':'#15803D',letterSpacing:'.06em'}}>{v.ativo?'PAUSAR':'ATIVAR'}</button></div>
+<button onClick={()=>alternar(v.codigo,v.ativo)} style={{background:'#fff',border:'1px solid #E2E9DE',outline:'none',borderRadius:12,padding:'12px 15px',fontSize:11.5,fontWeight:800,color:v.ativo?'#B45309':'#15803D',letterSpacing:'.06em'}}>{v.ativo?'PAUSAR':'ATIVAR'}</button>
+<button onClick={()=>{setErroApagar('');setConfirmar(confirmar===v.codigo?'':v.codigo);}} title='Apagar este presente' style={{background:'#fff',border:'1px solid #E2E9DE',outline:'none',borderRadius:12,padding:'12px 13px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+<svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='#C2410C' strokeWidth='1.9' strokeLinecap='round' strokeLinejoin='round'><polyline points='3 6 5 6 21 6'/><path d='M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6'/><path d='M10 11v6M14 11v6'/><path d='M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2'/></svg></button></div>
+{confirmar===v.codigo&&(<div style={{marginTop:9,background:'#FEF6F1',border:'1px solid #F6DFD0',borderRadius:13,padding:'12px 13px'}}>
+<div style={{fontSize:12.5,color:'#7C3A12',fontWeight:700,lineHeight:1.45}}>Apagar o presente "{v.titulo}"?</div>
+<div style={{fontSize:11.5,color:'#A4794F',marginTop:3,lineHeight:1.45}}>O link para de funcionar na hora e nao tem como voltar atras.</div>
+{erroApagar&&<div style={{fontSize:11.5,color:'#B3261E',marginTop:7,lineHeight:1.45}}>{erroApagar}</div>}
+<div style={{display:'flex',gap:8,marginTop:10}}>
+<button onClick={()=>apagar(v.codigo)} disabled={apagando===v.codigo} style={{flex:1,background:'#C2410C',border:'none',outline:'none',borderRadius:11,padding:'11px',fontSize:11.5,fontWeight:800,color:'#fff',letterSpacing:'.06em',opacity:apagando===v.codigo?.6:1}}>{apagando===v.codigo?'APAGANDO...':'SIM, APAGAR'}</button>
+<button onClick={()=>{setConfirmar('');setErroApagar('');}} style={{background:'#fff',border:'1px solid #EADCD0',outline:'none',borderRadius:11,padding:'11px 16px',fontSize:11.5,fontWeight:800,color:'#7C6A5A',letterSpacing:'.06em'}}>CANCELAR</button></div></div>)}
 {aberto===v.codigo&&(<div style={{marginTop:11,borderTop:'1px solid #F0F4EE',paddingTop:10}}>
 {resgates===undefined&&<div style={{fontSize:12,color:'#A3AD9D'}}>Carregando...</div>}
 {resgates&&resgates.length===0&&<div style={{fontSize:12,color:'#A3AD9D'}}>Ninguem resgatou ainda.</div>}
