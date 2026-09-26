@@ -15,7 +15,7 @@ BEGIN
 
   SELECT usados INTO v_usados FROM vouchers WHERE codigo = lower(p_codigo) FOR UPDATE;
   IF NOT FOUND THEN
-    RETURN json_build_object('ok', false, 'erro', 'Presente nao encontrado.');
+    RETURN json_build_object('ok', false, 'erro', 'Presente não encontrado.');
   END IF;
 
   SELECT COUNT(*) INTO v_resgates FROM gift_passes WHERE lower(codigo) = lower(p_codigo);
@@ -23,7 +23,7 @@ BEGIN
   IF COALESCE(v_usados, 0) > 0 OR v_resgates > 0 THEN
     RETURN json_build_object(
       'ok', false,
-      'erro', 'Esse presente ja foi resgatado por alguem, entao nao da pra apagar sem perder o registro. Use PAUSAR para tirar ele de circulacao.'
+      'erro', 'Esse presente já foi resgatado por alguém, então não dá pra apagar sem perder o registro. Use PAUSAR para tirar ele de circulação.'
     );
   END IF;
 
