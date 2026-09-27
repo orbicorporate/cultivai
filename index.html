@@ -548,17 +548,17 @@ const TOUR_PASSOS=[
 ];
 function PrimeirosPassos({passo1,passo2,passo3,onComecar}){
 const passos=[
-{feito:passo1,n:'1',t:'Escolha o que você quer plantar',d:'Pode ser pela região onde você mora ou pela lista com todas as culturas.'},
-{feito:passo2,n:'2',t:'Diga o tamanho da sua área',d:'O app já mostra a conta pronta pra 1 hectare, que são 10.000 m². Você troca pelo tamanho da sua e os valores se ajustam sozinhos.'},
-{feito:passo3,n:'3',t:'Acompanhe o que acontece de verdade',d:'Anote gastos e vendas no financeiro e siga as etapas pelo calendário.'}];
+{feito:passo1,n:'1',t:'Escolha a cultura',d:'Pela sua região ou pela busca'},
+{feito:passo2,n:'2',t:'Diga o tamanho da área',d:'Vem pronta pra 1 hectare (10.000 m²)'},
+{feito:passo3,n:'3',t:'Acompanhe os números',d:'Gastos, vendas e o calendário'}];
 const feitos=passos.filter(p=>p.feito).length;
 return(<div style={{padding:'6px 22px 16px'}}>
 <div style={{background:'linear-gradient(152deg, rgba(255,255,255,.97) 0%, rgba(255,255,255,.82) 100%)',backdropFilter:'blur(22px) saturate(185%)',WebkitBackdropFilter:'blur(22px) saturate(185%)',border:'1px solid rgba(255,255,255,.75)',borderRadius:22,padding:'20px 18px 18px',boxShadow:'0 14px 38px -16px rgba(11,45,31,.24), inset 0 1px 0 rgba(255,255,255,.9)'}}>
 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:3}}>
 <div className='serif' style={{fontSize:19,fontWeight:800,color:'#16311F',letterSpacing:'-.01em'}}>Comece por aqui</div>
 <div style={{fontSize:11.5,fontWeight:700,color:'#7E8B7A',flexShrink:0}}>{feitos} de 3</div></div>
-<div style={{fontSize:13.5,color:'#6B7768',lineHeight:1.5,marginBottom:15}}>Três passos pra descobrir quanto a sua terra pode render.</div>
-{passos.map((p,i)=>(<div key={i} style={{display:'flex',gap:12,alignItems:'flex-start',marginBottom:i===2?0:14}}>
+<div style={{fontSize:13.5,color:'#6B7768',lineHeight:1.5,marginBottom:13}}>Três passos pra saber quanto rende.</div>
+{passos.map((p,i)=>(<div key={i} style={{display:'flex',gap:12,alignItems:'flex-start',marginBottom:i===2?0:11}}>
 <div style={{width:30,height:30,borderRadius:'50%',flexShrink:0,marginTop:1,background:p.feito?'#1B4332':'#EDF2EB',color:p.feito?'#fff':'#5F6E5C',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,fontWeight:800}}>
 {p.feito?<svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='#fff' strokeWidth='3' strokeLinecap='round' strokeLinejoin='round'><polyline points='20 6 9 17 4 12'/></svg>:p.n}</div>
 <div style={{flex:1,minWidth:0}}>
