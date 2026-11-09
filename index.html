@@ -677,7 +677,7 @@ const CALC_CSS = `
 .cn .trans{animation:cnIn .28s ease both}
 @keyframes cnIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.cn .trans{animation:none}}
-@media (max-width:370px){.cn{padding-left:16px;padding-right:16px}.cn h2.q{font-size:23px}.cn .big{font-size:34px}.cn .chips.c3{grid-template-columns:1fr 1fr}.cn .chips.c3 .opt:last-child{grid-column:1/-1}}
+@media (max-width:370px){.cn{padding-left:16px;padding-right:16px}.cn h2.q{font-size:23px}.cn .big{font-size:34px}.cn .chips.c3.cen{grid-template-columns:1fr;gap:10px}.cn .chips.c3.cen .opt{flex-direction:row;align-items:center;gap:12px;padding:12px 16px;min-height:64px}.cn .chips.c3.cen .opt .ot{flex:1}.cn .chips.c3.cen .opt .ov,.cn .chips.c3.cen .opt .od{font-size:13.5px}.cn .chips.c3.cen .opt .sug{left:auto;right:14px;transform:none;top:-10px}}
 `;
 
 const LI_PATHS = {
@@ -1117,7 +1117,7 @@ function CalcScreen({ cultura, regiao, userId, precarregar, planoAtual, historic
           {CN_AREAS.map((a) => (
             <div key={a.v} className={"ch" + (area === a.v && !outroArea ? " on" : "")} onClick={() => { setArea(a.v); setOutroArea(false); marcar("area"); }}><Shine />{a.l}</div>
           ))}
-          <div className={"ch wide" + (outroArea ? " on" : "")} onClick={() => setOutroArea(true)}><Shine />Outro tamanho (m², hectare ou alqueire)</div>
+          <div className={"ch wide" + (outroArea ? " on" : "")} onClick={() => setOutroArea(true)}><Shine />Outro tamanho</div>
         </div>
         {outroArea && (
           <div className="adj">
@@ -1137,9 +1137,9 @@ function CalcScreen({ cultura, regiao, userId, precarregar, planoAtual, historic
           </div>
         )}
         <div style={{ height: 14 }} />
-        <EasyLinha>{rascunhoAviso ? <>Recuperei a conta que você tinha começado. Se preferir, <span style={{ textDecoration: "underline", cursor: "pointer", fontWeight: 600 }} onClick={recomecar}>comece do zero</span>.</> : <>A gente já preencheu com a média da sua região. Só confira e toque em Avançar.</>}</EasyLinha>
+        <EasyLinha>{rascunhoAviso ? <>Recuperei a conta que você tinha começado. Se preferir, <span style={{ textDecoration: "underline", cursor: "pointer", fontWeight: 600 }} onClick={recomecar}>comece do zero</span>.</> : <>Já preenchemos tudo com a média da sua região. É só conferir e avançar.</>}</EasyLinha>
         <div style={{ height: 12 }} />
-        <button className="sec" onClick={() => setAjArea((v) => !v)}><span>Ajustar {cultura.cultivares.length > 1 ? `tipo de ${nomeMin}, ` : ""}orgânico{perfilEst ? " ou estufa" : ""}</span><span className="arr"><LI n="seta" size={18} /></span></button>
+        <button className="sec" onClick={() => setAjArea((v) => !v)}><span>{cultura.cultivares.length > 1 ? "Variedade" : "Opções"}{perfilEst ? ", orgânico e estufa" : " e orgânico"}</span><span className="arr"><LI n="seta" size={18} /></span></button>
         {ajArea && (
           <div className="adj">
             {cultura.cultivares.length > 1 && (<>
@@ -1190,16 +1190,16 @@ function CalcScreen({ cultura, regiao, userId, precarregar, planoAtual, historic
     return (
       <div className="trans" key="p2">
         <div className="blk tint butter" style={{ minHeight: 150, borderRadius: "28px 56px 28px 28px" }}>
-          <div className="hang">{miniFoto}{cultura.nome}</div>
+          <div className="hang"><div className="mini"><LI n="trator" size={16} sw={2} /></div>{perene ? "Só uma vez" : "A cada plantio"}</div>
           <div style={{ position: "absolute", right: 16, top: 16 }}><span className={"tag" + (editado ? " ink" : "")}>{editado ? "Seus valores" : "Média da região"}</span></div>
           <div className="big" style={{ marginTop: 44 }}>{fmt(implT).replace(",00", "")}</div>
-          <div className="sub">{perene ? "Você paga uma vez, antes de plantar. Depois a lavoura rende por anos." : `Pra ${cnFmtArea(area)}, a cada plantio`}</div>
+          <div className="sub">{perene ? "Antes de plantar. Depois a lavoura rende por anos." : `Pra ${cnFmtArea(area)}, antes de plantar`}</div>
         </div>
         <div className="list" style={{ marginTop: 14 }}>
           {IMPLANT_CATEGORIAS.map((c) => { const [rot, ic] = IMPL_ROTULOS[c.id] || [c.t, "recibo"]; return linhaValor(c.id, rot, ic, Math.round((Number(implantItens[c.id]) || 0) * (organico ? 1.2 : 1) * ha), (v) => { setImplantItens((pp) => ({ ...pp, [c.id]: Math.round(v / ((organico ? 1.2 : 1) * (ha || 1))) })); marcar("implant"); }); })}
         </div>
         <div style={{ height: 12 }} />
-        <EasyLinha>{editado ? "Esses são os seus valores. Pode seguir." : `Esse é o custo médio da região pra ${cnFmtArea(area)}. Toque em um valor pra trocar pelo seu.`}</EasyLinha>
+        <EasyLinha>{editado ? "Esses já são os seus valores. Pode seguir." : "Toque em qualquer valor pra trocar pelo seu."}</EasyLinha>
       </div>
     );
   }
@@ -1214,7 +1214,7 @@ function CalcScreen({ cultura, regiao, userId, precarregar, planoAtual, historic
           <div className="big" style={{ marginTop: 48, position: "relative" }}>{fmtN(prodT)}<small>{un}</small></div>
           <div className="sub" style={{ position: "relative" }}>Por safra, na sua área{estufaAtiva ? " (com estufa)" : ""}</div>
         </div>
-        <div className="chips c3" style={{ marginTop: 18 }}>
+        <div className="chips c3 cen" style={{ marginTop: 18 }}>
           {cenarios.map((c) => { const v = Math.round(base * c.f); const on = cenAtual === c.id; const delta = c.id === "normal" ? null : lucroCom(v) - lucroCom(base); return (
             <div key={c.id} className={"opt" + (on ? " on" : "")} onClick={() => { setProdHa(v); marcar("prodHa"); }}>
               {c.id === "normal" && <span className="sug tag">Sugerido</span>}
@@ -1225,9 +1225,9 @@ function CalcScreen({ cultura, regiao, userId, precarregar, planoAtual, historic
             </div>); })}
         </div>
         <div style={{ height: 14 }} />
-        <EasyLinha onClick={() => { setProdHa(Math.round(base * 0.85)); marcar("prodHa"); }}>Primeira vez com {nomeMin}? Toque aqui pra fazer a conta com "Se der problema", mais segura.</EasyLinha>
+        <EasyLinha onClick={() => { setProdHa(Math.round(base * 0.85)); marcar("prodHa"); }}>Primeira vez com {nomeMin}? Faça a conta com "Se der problema".</EasyLinha>
         <div style={{ height: 12 }} />
-        <button className="sec" onClick={() => setAjColheita((v) => !v)}><span>Ajustar {un} por hectare</span><span className="arr"><LI n="seta" size={18} /></span></button>
+        <button className="sec" onClick={() => setAjColheita((v) => !v)}><span>Digitar minha colheita</span><span className="arr"><LI n="seta" size={18} /></span></button>
         {ajColheita && (
           <div className="adj">
             <div className="fld"><label>Quanto você espera colher por hectare</label>
@@ -1241,13 +1241,13 @@ function CalcScreen({ cultura, regiao, userId, precarregar, planoAtual, historic
   }
   function Passo4() {
     const insumosT = Math.round(manejoS);
-    const textoPeriodo = moModo === "mensal" ? `por ${moPeriodoMesesEf} ${moPeriodoMesesEf === 1 ? "mês" : "meses"}, ${fmt(moValor)} por mês cada` : `${moPeriodoDiasEf} diárias de ${fmt(moValorDiaria)} cada`;
+    const textoPeriodo = moModo === "mensal" ? `${moPeriodoMesesEf} ${moPeriodoMesesEf === 1 ? "mês" : "meses"} · ${fmt(moValor).replace(",00", "")}/mês cada` : `${moPeriodoDiasEf} diárias · ${fmt(moValorDiaria).replace(",00", "")} cada`;
     return (
       <div className="trans" key="p4">
         <div className="grid" style={{ minHeight: 160 }}>
           <div className="blk dark" style={{ flex: 1.4, borderRadius: "28px 28px 56px 28px" }}>
             <Shine />
-            <div className="hang">{miniFoto}{cultura.nome}</div>
+            <div className="hang"><div className="mini"><LI n="repetir" size={16} sw={2} /></div>Toda safra</div>
             <div className="big" style={{ marginTop: 46, fontSize: custoT - implT >= 1000000 ? 28 : 34, whiteSpace: "nowrap" }}>{fmt(manejoS + maoDeObraT + benefT).replace(",00", "")}</div>
             <div className="sub">Por safra, tudo junto</div>
           </div>
@@ -1265,12 +1265,12 @@ function CalcScreen({ cultura, regiao, userId, precarregar, planoAtual, historic
             <button className="sb r" onClick={() => { setMoTrabalhadores(moTrabalhadoresEf + 1); marcar("mo"); }} aria-label="mais"><Shine /><LI n="mais" size={22} color="#fff" style={{ position: "relative" }} /></button>
             <div className="sh">{textoPeriodo}</div>
           </div>
-          <button className="sec" style={{ height: 46, fontSize: 14 }} onClick={() => setMoModalAberto(true)}><span>Mudar pra diária, meses ou encargos</span><span className="arr"><LI n="seta" size={18} /></span></button>
+          <button className="sec" style={{ height: 46, fontSize: 14 }} onClick={() => setMoModalAberto(true)}><span>Ajustar mão de obra</span><span className="arr"><LI n="seta" size={18} /></span></button>
         </div>
         <div style={{ height: 12 }} />
         <button className="row sq" style={{ width: "100%", border: "1px solid var(--hair)" }} onClick={() => setAjManejo((v) => !v)}>
           <LI n="frasco" size={22} />
-          <div className="rt">Adubo, veneno e materiais<small>{editados.has("manejo") ? "Seus valores" : "Média da região"} · toque pra mudar</small></div>
+          <div className="rt">Adubo, veneno e materiais<small>{editados.has("manejo") ? "Seus valores" : "Média da região"}</small></div>
           <div className="rv">{fmt(insumosT).replace(",00", "")}</div>
           <span className="arr"><LI n="seta" size={18} /></span>
         </button>
@@ -1281,7 +1281,7 @@ function CalcScreen({ cultura, regiao, userId, precarregar, planoAtual, historic
         )}
         {forma && forma.custoKg > 0 && <div className="row sq" style={{ marginTop: 10, cursor: "default" }}><LI n="cafe" size={22} /><div className="rt">Beneficiamento ({forma.label.toLowerCase()})<small>{fmt(forma.custoKg)} por {un} colhido</small></div><div className="rv">{fmt(benefT).replace(",00", "")}</div></div>}
         <div style={{ height: 12 }} />
-        <EasyLinha>{moTrabalhadoresEf >= R.moRecomendado ? `Com ${moTrabalhadoresEf} ${moTrabalhadoresEf === 1 ? "pessoa" : "pessoas"} você cobre plantio e colheita sem correria.` : `Pra ${cnFmtArea(area)} de ${nomeMin}, o normal é ${R.moRecomendado} ${R.moRecomendado === 1 ? "pessoa" : "pessoas"}. Com menos, a colheita pode atrasar.`}</EasyLinha>
+        <EasyLinha>{moTrabalhadoresEf >= R.moRecomendado ? `${moTrabalhadoresEf} ${moTrabalhadoresEf === 1 ? "pessoa dá" : "pessoas dão"} conta do plantio e da colheita.` : `O normal pra essa área é ${R.moRecomendado} ${R.moRecomendado === 1 ? "pessoa" : "pessoas"}. Com menos, a colheita atrasa.`}</EasyLinha>
       </div>
     );
   }
@@ -1319,11 +1319,11 @@ function CalcScreen({ cultura, regiao, userId, precarregar, planoAtual, historic
         )}
         <div className="grid">
           {campoPreco("Atacado", "CEASA, atravessador", precoA, setPrecoA, refA, "precoA", "lav")}
-          {campoPreco("Feira ou direto", "varejo, pro cliente", precoV, setPrecoV, refV, "precoV", "butter")}
+          {campoPreco("Feira ou direto", "pro cliente final", precoV, setPrecoV, refV, "precoV", "butter")}
         </div>
         <div className="blk glass" style={{ marginTop: 14, flexDirection: "row", alignItems: "center", gap: 12, justifyContent: "flex-start", padding: "16px 18px" }}>
           <LI n="balanca" size={24} color="#4A5B51" />
-          <div style={{ fontSize: 15, lineHeight: 1.45 }}>Misturando os dois ({dez} de cada 10 {un === "kg" ? "caixas" : "vendas"} no atacado), dá uns <b>{fmt(precoMedioPonderado)}</b> por {un}.</div>
+          <div style={{ fontSize: 15, lineHeight: 1.45 }}>{dez} de cada 10 {un === "kg" ? "caixas" : "vendas"} vão pro atacado. Na média, você recebe <b>{fmt(precoMedioPonderado)}</b> por {un}.</div>
         </div>
         <div style={{ height: 12 }} />
         <button className="sec" onClick={() => setAjAtacado((v) => !v)}><span>Mudar quanto vai pro atacado</span><span className="arr"><LI n="seta" size={18} /></span></button>
@@ -1333,7 +1333,7 @@ function CalcScreen({ cultura, regiao, userId, precarregar, planoAtual, historic
           </div>
         )}
         <div style={{ height: 12 }} />
-        <EasyLinha>Quanto mais você vende na feira ou direto pro cliente, mais ganha por {un}. Mas dá mais trabalho pra escoar.</EasyLinha>
+        <EasyLinha>Vender direto rende mais por {un}, mas dá mais trabalho pra escoar.</EasyLinha>
       </div>
     );
   }
@@ -1361,7 +1361,7 @@ function CalcScreen({ cultura, regiao, userId, precarregar, planoAtual, historic
           <div className="rv" style={{ fontSize: 17, ...blur }}>{fmt(lucroAno).replace(",00", "")}</div>
         </div>
         <div style={{ height: 12 }} />
-        <EasyLinha>{nEditados === 0 ? "Você usou os valores sugeridos em todos os passos. Confira os seus antes de decidir." : `Você ajustou ${nEditados} ${nEditados === 1 ? "valor" : "valores"}. O resto é a média da região.`}</EasyLinha>
+        <EasyLinha>{nEditados === 0 ? "Tudo com a média da região. Confira os seus valores antes de decidir." : `Você ajustou ${nEditados} ${nEditados === 1 ? "valor" : "valores"}. O resto é a média da região.`}</EasyLinha>
         <div style={{ height: 12 }} />
         <button className="sec" onClick={() => setContaAberta((v) => !v)}><span>{contaAberta ? "Fechar conta completa" : "Ver conta completa"}</span><span className="arr"><LI n="seta" size={18} style={{ transform: contaAberta ? "rotate(90deg)" : "none" }} /></span></button>
         {contaAberta && (
@@ -1427,7 +1427,7 @@ function CalcScreen({ cultura, regiao, userId, precarregar, planoAtual, historic
         {etapa > 1 && etapa < 6 && <button className="b alt" onClick={voltar}>Voltar</button>}
         {etapa < 6 && <button className="b next" onClick={avancar}><Shine /><span style={{ position: "relative" }}>{deResultado ? "Ver resultado" : etapa === 5 ? "Ver resultado" : "Avançar"}</span></button>}
         {etapa === 6 && (<>
-          <button className="b alt" onClick={() => { setContaAberta(true); setTimeout(() => { try { document.querySelector(".cn .conta").scrollIntoView({ behavior: "smooth", block: "start" }); } catch (err) {} }, 50); }}>Fazer outra conta</button>
+          <button className="b alt" onClick={() => { setContaAberta(true); setTimeout(() => { try { document.querySelector(".cn .conta").scrollIntoView({ behavior: "smooth", block: "start" }); } catch (err) {} }, 50); }}>Mudar valores</button>
           <button className="b save" onClick={salvar} disabled={salvando || salvou}>{salvou ? "Guardada" : salvando ? "Guardando..." : "Guardar essa conta"}</button>
         </>)}
       </div>
