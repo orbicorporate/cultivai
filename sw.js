@@ -1,4 +1,4 @@
-const CACHE='cultivai-v91';
+const CACHE='cultivai-v92';
 const ASSETS=['/','/index.html','/manifest.json','/assets/fonts/open-sans-latin-400-normal.woff2','/assets/fonts/open-sans-latin-600-normal.woff2','/assets/fonts/open-sans-latin-700-normal.woff2','/assets/fonts/open-sans-latin-800-normal.woff2'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));self.skipWaiting();});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE&&k!=='cultivai-shared'&&k!=='cultivai-img').map(k=>caches.delete(k)))));self.clients.claim();});
