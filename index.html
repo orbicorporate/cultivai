@@ -154,8 +154,7 @@ return(<div className="kit clima-bento">
 </div>
 </div>
 {painelBusca}
-{dicas.length>0&&<div style={{marginTop:12}}><EasyLinha>{dicas[0].texto}</EasyLinha></div>}
-{dicas.length>1&&<div style={{marginTop:8}}><EasyLinha>{dicas[1].texto}</EasyLinha></div>}
+{dicas.slice(0,2).map((d,i)=>(<div key={i} className="dica-clima" style={{marginTop:i===0?12:8}}><div className="av"><LI n="folha" size={16} color="#C9F26B" sw={1.8}/></div><div>{d.texto}</div></div>))}
 </div>);}
 function AuthScreen(){const[modo,setModo]=useState('login');const[email,setEmail]=useState('');const[senha,setSenha]=useState('');const[nome,setNome]=useState('');const[erro,setErro]=useState('');const[loading,setLoading]=useState(false);const[msg,setMsg]=useState('');const canvasRef=useRef(null);useEffect(()=>{const canvas=canvasRef.current;if(!canvas)return;const ctx=canvas.getContext('2d');let particles=[];let raf;function resize(){canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;}function makeParticles(){const count=Math.min(55,Math.floor(canvas.width/22));particles=Array.from({length:count},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.6+.4,speed:Math.random()*.35+.08,drift:(Math.random()-.5)*.25,alpha:Math.random()*.5+.15,hue:Math.random()>.5?'74,222,128':'217,255,77'}));}function tick(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.y-=p.speed;p.x+=p.drift;if(p.y<-10){p.y=canvas.height+10;p.x=Math.random()*canvas.width;}ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(${p.hue},${p.alpha})`;ctx.shadowColor=`rgba(${p.hue},.8)`;ctx.shadowBlur=4;ctx.fill();});raf=requestAnimationFrame(tick);}resize();makeParticles();tick();const onResize=()=>{resize();makeParticles();};window.addEventListener('resize',onResize);return()=>{cancelAnimationFrame(raf);window.removeEventListener('resize',onResize);};},[]);async function entrarComGoogle(){setErro('');await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin}});}async function entrarComApple(){setErro('');await sb.auth.signInWithOAuth({provider:'apple',options:{redirectTo:window.location.origin}});}async function submit(){setErro('');setMsg('');setLoading(true);try{if(modo==='cadastro'){const{error}=await sb.auth.signUp({email,password:senha,options:{data:{nome}}});if(error)throw error;setMsg('✅ Conta criada! Verifique seu e-mail.');}else if(modo==='recuperar'){const{error}=await sb.auth.resetPasswordForEmail(email);if(error)throw error;setMsg('✅ E-mail enviado!');}else{const{error}=await sb.auth.signInWithPassword({email,password:senha});if(error)throw error;}}catch(e){const m={'Invalid login credentials':'E-mail ou senha incorretos.','User already registered':'E-mail já cadastrado.','Password should be at least 6 characters':'Senha deve ter 6+ caracteres.'};setErro(m[e.message]||e.message);}setLoading(false);}const titulo=modo==='login'?<>Entre pra cuidar da <b>sua lavoura</b></>:modo==='cadastro'?<>Crie sua conta <b>em 1 minuto</b></>:<>Vamos <b>recuperar</b> sua senha</>;
 return(<div className="kit" style={{minHeight:'100vh',padding:'0 0 40px'}}>
@@ -609,7 +608,7 @@ return()=>{rodando=false;cancelAnimationFrame(raf);};},[size]);
 return <canvas ref={ref} className={className} style={{width:size,height:size,display:'block'}} aria-hidden />;}
 function HomeScreen({souMaster,onAbrirAdmin,onSelect,usuario,onLogout,planos,historico,lucroTotal,irHistorico,irPlanos,irNotas,irChat,irFazenda,irCalendario,irAssinatura,irFinanceiro,planoAtual,trialAtivo,trialHorasRestantes,userId,cidadeSalva,onCidadeSalva,cidadeHome,onCidadeHome,onAbrirTour,tourPendente,passo1,passo2,passo3,onComecar}){const modoGuiado=!(passo1&&passo2&&passo3);const[climaHoje,setClimaHoje]=useState(null);const[regiaoId,setRegiaoId]=useState(null);const[catSel,setCatSel]=useState(null);const[busca,setBusca]=useState('');const[buscaLista,setBuscaLista]=useState('');const[pragasCount,setPragasCount]=useState(0);const[irrigacaoAmanha,setIrrigacaoAmanha]=useState(0);const[notasCount,setNotasCount]=useState(0);const[calendarioCount,setCalendarioCount]=useState(0);useEffect(()=>{if(!userId)return;sb.from('notas_cultura').select('id',{count:'exact',head:true}).eq('usuario_id',userId).eq('categoria','pragas_observadas').then(({count})=>setPragasCount(count||0));sb.from('notas_cultura').select('id',{count:'exact',head:true}).eq('usuario_id',userId).then(({count})=>setNotasCount(count||0));sb.from('planos_inicio').select('cultura_nome,data_inicio').eq('usuario_id',userId).then(({data})=>{if(!data||!data.length)return;const amanha=(()=>{const d=new Date();d.setDate(d.getDate()+1);return d.toISOString().slice(0,10);})();let n=0;data.forEach(ini=>{const found=TODAS_MERGED.find(x=>x.c.nome===ini.cultura_nome);if(!found)return;try{const etapas=calcularEtapasComData(found.c,ini.data_inicio);etapas.forEach(e=>{if(e.icon==='💧'&&e.dataISO===amanha)n++;});}catch(e){}});setIrrigacaoAmanha(n);});(async()=>{const{data:inicios}=await sb.from('planos_inicio').select('cultura_nome,data_inicio').eq('usuario_id',userId);const{data:progresso}=await sb.from('plano_progresso').select('cultura_nome,etapa_id,feito').eq('usuario_id',userId);const{data:lembretesDb}=await sb.from('lembretes').select('data').eq('usuario_id',userId).eq('feito',false);const feitosSet=new Set((progresso||[]).filter(p=>p.feito).map(p=>`${p.cultura_nome}::${p.etapa_id}`));const hojeISO=new Date().toISOString().slice(0,10);let n=0;(inicios||[]).forEach(ini=>{const found=TODAS_MERGED.find(x=>x.c.nome===ini.cultura_nome);if(!found)return;try{const etapas=calcularEtapasComData(found.c,ini.data_inicio);etapas.forEach(e=>{if(feitosSet.has(`${ini.cultura_nome}::${e.id}`))return;if(e.dataISO<=hojeISO)n++;});}catch(e){}});(lembretesDb||[]).forEach(l=>{if(l.data<=hojeISO)n++;});setCalendarioCount(n);})();},[userId]);const regiao=REGIOES.find(r=>r.id===regiaoId);const cat=catSel==='verduras'?VERDURAS:catSel==='temperos'?TEMPEROS:catSel==='cogumelos'?COGUMELOS:catSel==='apicultura'?APICULTURA:catSel==='flores'?FLORES:catSel==='hidroponia'?HIDROPONIA:catSel==='silvicultura'?SILVICULTURA:null;const nome=(usuario?.user_metadata?.nome||usuario?.email?.split('@')[0]||'Produtor').split(' ')[0];function selecionarRegiao(id){setRegiaoId(id);setCatSel(null);setBuscaLista('');}function selecionarCat(id){setCatSel(id);setRegiaoId(null);setBuscaLista('');}const buscaAtiva=normalizarBusca(busca).length>=2;const resultadosBusca=buscaAtiva?(()=>{const t=normalizarBusca(busca);const pont=n=>{const s=normalizarBusca(n);if(s.startsWith(t))return 0;if(s.split(/[\s\-]+/).some(p=>p.startsWith(t)))return 1;return 2;};return TODAS_MERGED.filter(x=>normalizarBusca(x.c.nome).includes(t)||normalizarBusca(x.rg.label).includes(t)).map(x=>({x,p:Math.min(pont(x.c.nome),normalizarBusca(x.rg.label).startsWith(t)?1:3)})).sort((a,b)=>a.p-b.p||b.x.c.lucro_ha-a.x.c.lucro_ha).map(o=>o.x);})():[];function filtrarLista(lista){const t=normalizarBusca(buscaLista);if(t.length<1)return lista;return lista.filter(cu=>normalizarBusca(cu.nome).includes(t));}const regiaoFake={id:'geral',label:cat?cat.label:'',emoji:cat?cat.emoji:'',cor:cat?cat.cor:''};const todasView=catSel==='todas';  const HOME_CSS = `
 .home-nova{background:linear-gradient(180deg,#EEF6EE 0%,#F7F7F3 45%,#FAFAF7 100%);min-height:100vh;padding:0 20px 130px}
-.home-nova .topo{display:flex;align-items:center;gap:12px;padding:calc(14px + env(safe-area-inset-top,0px)) 0 6px}
+.home-nova .topo{display:flex;align-items:center;gap:12px;padding:calc(14px + env(safe-area-inset-top,0px)) 0 10px}
 .home-nova .topo .av{width:46px;height:46px;border-radius:50%;overflow:hidden;flex:none;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.08);background:#D9F0DC}
 .home-nova .topo .nm{flex:1;min-width:0}
 .home-nova .topo .nm b{display:block;font-size:17px;font-weight:700;color:var(--ink);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -619,8 +618,8 @@ function HomeScreen({souMaster,onAbrirAdmin,onSelect,usuario,onLogout,planos,his
 .home-nova .pill.x{width:34px;padding:0;justify-content:center}
 .home-nova .pill.ouro{background:linear-gradient(135deg,#F2C230,#E0A800);color:#1E1E1E;border-color:transparent}
 .home-nova .pill.chama{background:var(--ink-grad);color:#fff;border-color:transparent;animation:tourPulsa 2.2s ease-in-out infinite}
-.home-nova h2.q{margin:14px 0 16px}
-.home-nova .sec-t{font-size:22px;line-height:1.25;font-weight:400;color:#6B7A70;margin:26px 0 14px}
+.home-nova h2.q{margin:10px 0 18px}
+.home-nova .sec-t{font-size:22px;line-height:1.25;font-weight:400;color:#6B7A70;margin:30px 0 16px}
 .home-nova .sec-t b{color:var(--ink);font-weight:700}
 .home-nova .carr{display:flex;gap:12px;overflow-x:auto;margin:0 -20px;padding:4px 20px 8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
 .home-nova .carr::-webkit-scrollbar{display:none}
@@ -629,8 +628,8 @@ function HomeScreen({souMaster,onAbrirAdmin,onSelect,usuario,onLogout,planos,his
 .home-nova .foto-card:active{transform:scale(.98)}
 .home-nova .foto-card.sel{outline:3px solid #1B4332;outline-offset:-3px}
 .home-nova .foto-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.home-nova .foto-card .veu{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.15) 100%)}
-.home-nova .foto-card .tt{position:absolute;left:14px;right:14px;bottom:14px;color:#fff}
+.home-nova .foto-card .veu{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.78) 0%,rgba(0,0,0,.35) 38%,rgba(0,0,0,.06) 62%,rgba(0,0,0,.12) 100%)}
+.home-nova .foto-card .tt{position:absolute;left:14px;right:16px;bottom:16px;color:#fff;text-align:right}
 .home-nova .foto-card .tt b{display:block;font-size:17px;font-weight:700;line-height:1.15}
 .home-nova .foto-card .tt small{display:block;font-size:12.5px;opacity:.8;margin-top:2px}
 .home-nova .foto-card .tag{position:absolute;top:12px;left:12px}
@@ -640,14 +639,14 @@ function HomeScreen({souMaster,onAbrirAdmin,onSelect,usuario,onLogout,planos,his
 .home-nova .busca .lupa{position:absolute;left:18px;top:50%;transform:translateY(-50%);display:flex;pointer-events:none;color:var(--ink2)}
 .home-nova .busca .limpar{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;border:none;background:rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer}
 .home-nova .plano{position:relative;border-radius:28px 28px 56px 28px;overflow:hidden;min-height:300px;display:flex;flex-direction:column;justify-content:flex-end;padding:18px;color:#fff;cursor:pointer}
-.home-nova .plano .veu{position:absolute;inset:0;background:linear-gradient(to top,rgba(14,30,20,.92) 0%,rgba(14,30,20,.45) 45%,rgba(0,0,0,.05) 100%)}
+.home-nova .plano .veu{position:absolute;inset:0;background:linear-gradient(to top,rgba(14,30,20,.96) 0%,rgba(14,30,20,.78) 30%,rgba(14,30,20,.3) 58%,rgba(0,0,0,.08) 100%)}
 .home-nova .plano>*:not(.hang){position:relative}
-.home-nova .plano .pt{font-size:13.5px;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.home-nova .plano .pt{font-size:13.5px;color:rgba(255,255,255,.92);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .home-nova .plano .pe{font-size:24px;font-weight:700;line-height:1.15;margin:6px 0 4px}
 .home-nova .plano .pv{font-size:14px;color:rgba(255,255,255,.85);line-height:1.4}
 .home-nova .plano .pb{height:5px;border-radius:99px;background:rgba(255,255,255,.22);margin:12px 0 12px;overflow:hidden}
 .home-nova .plano .pb i{display:block;height:100%;border-radius:99px;background:#22C55E}
-.home-nova .plano .b{height:52px;width:100%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);color:#fff;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.home-nova .plano .b{height:52px;width:100%;background:rgba(255,255,255,.94);border:1px solid rgba(255,255,255,.9);color:var(--ink);box-shadow:0 10px 24px -12px rgba(0,0,0,.5)}
 .home-nova .duo2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .home-nova .duo2 .blk{min-height:150px;justify-content:space-between;cursor:pointer}
 .home-nova .duo2 .blk .bt{font-size:16px;font-weight:700;line-height:1.2}
@@ -659,7 +658,8 @@ function HomeScreen({souMaster,onAbrirAdmin,onSelect,usuario,onLogout,planos,his
 .home-nova .passo .n{width:44px;height:44px;border-radius:50%;background:var(--ink-grad);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex:none}
 .home-nova .passo .t{flex:1;min-width:0;font-size:15px;font-weight:700;color:var(--ink);line-height:1.2}
 .home-nova .passo .t small{display:block;font-size:13px;color:var(--ink3);font-weight:400;margin-top:2px}
-.home-nova .clima-wrap{margin-bottom:12px}
+.home-nova .clima-wrap{margin-bottom:14px}
+.kit .dica-clima{display:flex;align-items:center;gap:12px;padding:10px 16px 10px 10px;border-radius:999px;background:rgba(255,255,255,.72);border:1px solid var(--hair);box-shadow:inset 0 1px 0 #fff;font-size:14px;line-height:1.4;color:var(--ink2)}.kit .dica-clima .av{width:34px;height:34px;border-radius:50%;flex:none;background:var(--ink-grad);display:flex;align-items:center;justify-content:center}
 @media (max-width:370px){.home-nova{padding-left:16px;padding-right:16px}.home-nova .carr{margin:0 -16px;padding:4px 16px 8px}.home-nova .duo2 .blk{min-height:136px;padding:16px}}
 `;
   const CATS = [["verduras", VERDURAS], ["temperos", TEMPEROS], ["cogumelos", COGUMELOS], ["apicultura", APICULTURA], ["flores", FLORES], ["hidroponia", HIDROPONIA], ["silvicultura", SILVICULTURA]];
@@ -685,18 +685,18 @@ function HomeScreen({souMaster,onAbrirAdmin,onSelect,usuario,onLogout,planos,his
           {busca && <button className="limpar" onClick={() => setBusca("")} aria-label="Limpar"><LI n="menos" size={16} /></button>}
         </div>
         {!buscaAtiva && (<>
-          <div id="escolha-cultura" className="carr" style={{ marginTop: 14 }}>
+          <div id="escolha-cultura" className="carr" style={{ marginTop: 16 }}>
             {REGIOES.map((r) => (
               <FotoCard key={r.id} foto={FOTOS_REGIAO[r.id]} cor={r.cor} emoji={r.emoji} label={r.label} sub={r.estados.join(", ")} tag={`${r.culturas.length} culturas`} sel={regiaoId === r.id} onClick={() => selecionarRegiao(r.id)} w={156} h={184} />
             ))}
           </div>
-          <div style={{ fontSize: 14, color: "var(--ink3)", margin: "10px 0 8px" }}>Outros tipos, pra qualquer região</div>
+          <div style={{ fontSize: 14, color: "var(--ink3)", margin: "18px 4px 10px" }}>Outros tipos, pra qualquer região</div>
           <div id="tour-categorias" className="carr">
             {CATS.map(([id, c]) => (
               <FotoCard key={id} foto={c.foto} cor={c.cor} emoji={c.emoji} label={c.label} sub={`${c.culturas.length} ${c.culturas.length === 1 ? "opção" : "opções"}`} sel={catSel === id} onClick={() => selecionarCat(id)} w={140} h={120} />
             ))}
           </div>
-          <div id="tour-todas-culturas" style={{ marginTop: 6 }}>
+          <div id="tour-todas-culturas" style={{ marginTop: 14 }}>
             <button className="sec" onClick={() => selecionarCat("todas")}><span>Ver todas as {TODAS_MERGED.length} culturas</span><span className="arr"><LI n="seta" size={18} /></span></button>
           </div>
         </>)}
@@ -1121,7 +1121,7 @@ function HomeScreen({souMaster,onAbrirAdmin,onSelect,usuario,onLogout,planos,his
               <div className="pb"><i style={{ width: `${p.pct}%` }} /></div>
               <button className="b">Continuar<LI n="seta" size={18} style={{ marginLeft: 8 }} /></button>
             </div>); })}
-          <div className="duo2" style={{ marginTop: 12 }}>
+          <div className="duo2" style={{ marginTop: 14 }}>
             <div id="tour-fazenda" className="blk tint mint" style={{ borderRadius: "28px 28px 28px 56px" }} onClick={irFazenda}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><LI n="casa" size={24} /><LI n="seta" size={18} color="#4A5B51" /></div>
               <div><div className="bt">Minha Fazenda</div><div className="bs">{planos.length > 0 || historico.length > 0 ? `${planos.length} plantando · ${historico.length} ${historico.length === 1 ? "conta guardada" : "contas guardadas"}` : "Suas contas e lavouras"}</div></div>
