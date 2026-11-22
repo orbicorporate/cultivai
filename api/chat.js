@@ -96,7 +96,58 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  const { messages, cultura, regiao, accessToken } = body || {};
+  const { messages, cultura, regiao, accessToken, modo } = body || {};
+
+  // Modo "extrair": o produtor falou ou fotografou um gasto/venda e o app quer os campos preenchidos.
+  // Entra com {modo:'extrair', tipo:'gasto'|'venda', texto?, imagem?:{media_type,data}} e sai JSON com os campos.
+  if (modo === 'extrair') {
+    if (!accessToken) { res.status(401).json({ error: 'nao_autenticado' }); return; }
+    if (!process.env.ANTHROPIC_API_KEY) { res.status(500).json({ error: 'chave_nao_configurada' }); return; }
+    const tipo = body.tipo === 'venda' ? 'venda' : 'gasto';
+    const texto = typeof body.texto === 'string' ? body.texto.slice(0, 2000) : '';
+    const imagem = body.imagem && body.imagem.data && ['image/jpeg', 'image/png', 'image/webp'].includes(body.imagem.media_type) && body.imagem.data.length <= 6_000_000 ? body.imagem : null;
+    if (!texto && !imagem) { res.status(400).json({ error: 'sem_entrada' }); return; }
+    // Conta no mesmo limite do chat, mas com teto maior: extrair é barato e não pode travar o lançamento.
+    try {
+      const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/chat_registrar_uso`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ limite: 80 }),
+      });
+      const uso = await rpcRes.json();
+      if (!uso || uso.permitido !== true) { res.status(429).json({ error: 'limite_diario_atingido' }); return; }
+    } catch (e) { res.status(500).json({ error: 'erro_verificacao_limite' }); return; }
+    const hoje = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+    const culturas = Array.isArray(body.culturas) ? body.culturas.filter((c) => typeof c === 'string').slice(0, 200) : [];
+    const sistemaExtrair =
+      `Você extrai dados de lançamentos financeiros de uma pequena fazenda brasileira a partir de um áudio transcrito e/ou da foto de um recibo, nota fiscal ou anotação. Hoje é ${hoje}. ` +
+      `Responda SOMENTE com um JSON válido, sem texto antes ou depois, sem markdown. ` +
+      (tipo === 'gasto'
+        ? `Formato: {"valor":number|null,"descricao":string|null,"data":"YYYY-MM-DD"|null,"categoria":"fertilizantes"|"defensivos"|"sementes"|"mao_obra"|"outros"|null,"cultura":string|null,"status":"pago"|"pendente"|null,"forma_pagamento":"pix"|"dinheiro"|"cartao"|"boleto"|"transferencia"|null}. `
+        : `Formato: {"valor_total":number|null,"produto":string|null,"quantidade":number|null,"unidade":"kg"|"ton"|"m3"|"sacas"|"caixas"|"un"|null,"preco_unit":number|null,"data":"YYYY-MM-DD"|null,"cultura":string|null,"comprador":string|null,"status":"recebido"|"a_receber"|null,"forma_pagamento":"pix"|"dinheiro"|"cartao"|"boleto"|"transferencia"|null}. `) +
+      `Regras: valores em reais como número (1.250,50 vira 1250.5). Datas relativas ("ontem", "sexta passada") viram data absoluta a partir de hoje. "Fiado", "vou pagar", "pra receber", "ainda não pagou" indicam pendente/a_receber; "paguei", "recebi", "à vista" indicam pago/recebido. ` +
+      `Se citar uma cultura, use exatamente um destes nomes quando bater: ${culturas.join(', ') || 'nenhuma lista fornecida'}; senão null. ` +
+      `Em recibo com vários itens, some o total e descreva os itens principais em poucas palavras. Nunca invente: campo desconhecido fica null.`;
+    const content = [];
+    if (imagem) content.push({ type: 'image', source: { type: 'base64', media_type: imagem.media_type, data: imagem.data } });
+    content.push({ type: 'text', text: texto ? `Transcrição do áudio ou texto digitado: "${texto}"` : 'Extraia os dados desta foto.' });
+    try {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 400, system: sistemaExtrair, messages: [{ role: 'user', content }] }),
+      });
+      if (!r.ok) { console.error('Anthropic extrair', r.status, await r.text()); res.status(502).json({ error: 'erro_ia' }); return; }
+      const data = await r.json();
+      const bruto = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('').trim();
+      const m = bruto.match(/\{[\s\S]*\}/);
+      let campos = null;
+      try { campos = m ? JSON.parse(m[0]) : null; } catch (e) { campos = null; }
+      if (!campos) { res.status(200).json({ campos: null, bruto }); return; }
+      res.status(200).json({ campos });
+    } catch (e) { console.error(e); res.status(500).json({ error: 'erro_interno' }); }
+    return;
+  }
 
   if (!accessToken) {
     res.status(401).json({ error: 'nao_autenticado' });
