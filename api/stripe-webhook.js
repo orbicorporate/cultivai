@@ -80,7 +80,20 @@ module.exports = async (req, res) => {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       const usuarioId = session.client_reference_id || (session.metadata && session.metadata.usuario_id);
-      if (usuarioId) {
+      const tipo = session.metadata && session.metadata.tipo;
+      if (session.mode === 'payment' && tipo === 'pacote3') {
+        // Pacote de contas avulsas: credita e segue (idempotente pela referencia)
+        if (usuarioId && process.env.AFILIADO_WEBHOOK_SEGREDO) {
+          const r = await rpc('rpc_creditar_contas', {
+            p_segredo: process.env.AFILIADO_WEBHOOK_SEGREDO,
+            p_usuario_id: usuarioId,
+            p_qtd: parseInt((session.metadata && session.metadata.qtd) || '3', 10) || 3,
+            p_referencia: session.id,
+            p_valor: (session.amount_total || 0) / 100,
+          });
+          console.log('contas creditadas', JSON.stringify(r));
+        }
+      } else if (usuarioId && session.subscription) {
         await rpc('rpc_atualizar_assinatura', {
           p_usuario_id: usuarioId,
           p_customer_id: session.customer,

@@ -17,10 +17,37 @@ module.exports = async (req, res) => {
 
     const precos = {
       mensal: { unit_amount: 3600, interval: 'month', nome: 'CultivAI Pro - Mensal' },
+      trimestral: { unit_amount: 9700, interval: 'month', interval_count: 3, nome: 'CultivAI Pro - 3 meses' },
+      semestral: { unit_amount: 16900, interval: 'month', interval_count: 6, nome: 'CultivAI Pro - 6 meses' },
       anual: { unit_amount: 29700, interval: 'year', nome: 'CultivAI Pro - Anual' },
     };
-    const p = precos[periodo] || precos.mensal;
     const origin = req.headers.origin || 'https://cultivai.app';
+
+    // Pacote de contas avulsas: pagamento unico, sem assinatura.
+    // O webhook credita as contas em rpc_creditar_contas (metadata.tipo = 'pacote3').
+    if (periodo === 'pacote3') {
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        customer_email: user.email,
+        client_reference_id: user.id,
+        line_items: [
+          {
+            price_data: {
+              currency: 'brl',
+              product_data: { name: 'CultivAI - 3 contas avulsas', description: 'Cada conta libera uma cultura pra sempre: resultado, conta guardada, plano passo a passo e guia.' },
+              unit_amount: 2990,
+            },
+            quantity: 1,
+          },
+        ],
+        success_url: `${origin}/?contas=sucesso`,
+        cancel_url: `${origin}/?contas=cancelado`,
+        metadata: { usuario_id: user.id, tipo: 'pacote3', qtd: '3' },
+      });
+      return res.status(200).json({ url: session.url });
+    }
+
+    const p = precos[periodo] || precos.anual;
 
     // Bonus de indicacao: quem entrou pelo link de um embaixador ativo
     // e ainda nao assinou ganha 10% de desconto + 2 meses gratis.
@@ -75,7 +102,7 @@ module.exports = async (req, res) => {
             currency: 'brl',
             product_data: { name: p.nome },
             unit_amount: p.unit_amount,
-            recurring: { interval: p.interval },
+            recurring: { interval: p.interval, ...(p.interval_count ? { interval_count: p.interval_count } : {}) },
           },
           quantity: 1,
         },
