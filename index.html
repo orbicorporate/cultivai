@@ -1643,7 +1643,7 @@ function CalcScreen({ cultura, regiao, userId, precarregar, planoAtual, historic
   const [estufaFracao, setEstufaFracao] = useState(d0.estufaFracao != null ? Number(d0.estufaFracao) : 100);
   const [estufaCustoM2, setEstufaCustoM2] = useState(d0.estufaCustoM2 != null ? Number(d0.estufaCustoM2) : perfilEst ? perfilEst.custoM2 : 0);
   const [formaVenda, setFormaVenda] = useState(d0.formaVenda || formaVendaPadrao(cultura));
-  const [editados, setEditados] = useState(() => new Set(d0.editados || (p ? ["area", "prodHa", "precoA", "precoV"] : [])));
+  const [editados, setEditados] = useState(() => new Set(d0.editados || (p ? ["area", "prodHa", "precoA", "precoV"].concat(d0.moTrabalhadores != null ? ["mo"] : []) : [])));
   const [etapa, setEtapaRaw] = useState(p ? 6 : rascunho && rascunho.etapa ? Math.min(6, rascunho.etapa) : 1);
   const [deResultado, setDeResultado] = useState(false);
   const [ajArea, setAjArea] = useState(false);
@@ -1671,7 +1671,7 @@ function CalcScreen({ cultura, regiao, userId, precarregar, planoAtual, historic
   const areaParaSlider = (a) => Math.round((1000 * (Math.log10(Math.max(a, areaMin)) - Math.log10(areaMin))) / (Math.log10(areaMax) - Math.log10(areaMin)));
   const sliderParaArea = (pp) => { const raw = areaMin * Math.pow(areaMax / areaMin, pp / 1000); const passo = raw < 1000 ? 50 : raw < 10000 ? 500 : raw < 100000 ? 1000 : 10000; return Math.round(raw / passo) * passo; };
   const marcar = (k) => setEditados((s) => { if (s.has(k)) return s; const n = new Set(s); n.add(k); return n; });
-  const entrada = { cv, cvNome: cv.name, area, prodHa, implantItens, manejoItens, precoA, precoV, pctA, moTrabalhadores, moModo, moValor, moValorDiaria, moPeriodoMeses, moPeriodoDias, moEncargosIncluir, moEncargosPct, organico, estufa, estufaFracao, estufaCustoM2, formaVenda };
+  const entrada = { cv, cvNome: cv.name, area, prodHa, implantItens, manejoItens, precoA, precoV, pctA, moTrabalhadores: editados.has("mo") ? moTrabalhadores : null, moModo, moValor, moValorDiaria, moPeriodoMeses, moPeriodoDias, moEncargosIncluir, moEncargosPct, organico, estufa, estufaFracao, estufaCustoM2, formaVenda };
   const R = useMemo(() => calcularSimulacao(cultura, regiao, entrada), [cultura, regiao, cvId, area, prodHa, implantItens, manejoItens, precoA, precoV, pctA, moTrabalhadores, moModo, moValor, moValorDiaria, moPeriodoMeses, moPeriodoDias, moEncargosIncluir, moEncargosPct, organico, estufa, estufaFracao, estufaCustoM2, formaVenda]);
   const { ha, implT, manejoS, maoDeObraT, estufaCustoSafra, custoT, recT, lucro, lucroAno, margem, retornoSafras, precoMedioPonderado, semEstufa, comEstufaPreview, lucroConvencional, lucroOrganico, estufaAtiva, fE, prodT, prodHaEf, precoAEf, precoVEf, kgA, kgV, moTrabalhadoresEf, moPeriodoMesesSugerido, moPeriodoDiasSugerido, moFrequenciaSugerida, faixa, veredito, perene, lucroPrimeira, forma, formas, benefT, estufaRecomendada, estufaInvest } = R;
   const moPeriodoMesesEf = R.moPeriodoMeses, moPeriodoDiasEf = R.moPeriodoDias;
@@ -2198,7 +2198,7 @@ function CalcScreen({ cultura, regiao, userId, precarregar, planoAtual, historic
         )}
         {forma && forma.custoKg > 0 && <div className="row sq" style={{ marginTop: 10, cursor: "default" }}><LI n="cafe" size={22} /><div className="rt">Beneficiamento ({forma.label.toLowerCase()})<small>{fmt(forma.custoKg)} por {un} colhido</small></div><div className="rv">{fmt(benefT).replace(",00", "")}</div></div>}
         <div style={{ height: 12 }} />
-        <EasyLinha>{moTrabalhadoresEf >= R.moRecomendado ? `${moTrabalhadoresEf} ${moTrabalhadoresEf === 1 ? "pessoa dá" : "pessoas dão"} conta do plantio e da colheita.` : `O normal pra essa área é ${R.moRecomendado} ${R.moRecomendado === 1 ? "pessoa" : "pessoas"}. Com menos, a colheita atrasa.`}</EasyLinha>
+        <EasyLinha>{moTrabalhadoresEf >= R.moRecomendado ? `${moTrabalhadoresEf} ${moTrabalhadoresEf === 1 ? "pessoa dá" : "pessoas dão"} conta do plantio e da colheita.` : <>O normal pra essa área é {R.moRecomendado} {R.moRecomendado === 1 ? "pessoa" : "pessoas"}. Com menos, a colheita atrasa. <span style={{ textDecoration: "underline", cursor: "pointer", fontWeight: 700 }} onClick={() => { setMoTrabalhadores(null); setEditados((prev) => { const n = new Set(prev); n.delete("mo"); return n; }); }}>Usar {R.moRecomendado}</span></>}</EasyLinha>
       </div>
     );
   }
